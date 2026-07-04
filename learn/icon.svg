@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#0a0a0a"/>
+  <g font-family="ui-monospace, 'JetBrains Mono', monospace" text-anchor="middle">
+    <text x="256" y="300" font-size="200" fill="#00e599" font-weight="500">0x</text>
+    <text x="256" y="420" font-size="56" fill="rgba(255,255,255,0.4)">learn</text>
+  </g>
+</svg>

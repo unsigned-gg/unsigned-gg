@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>unsigned/learn</title>
+  <meta name="description" content="Interactive explainers for the unsigned platform — gated behind a real boot sequence: tailnet, bastion, kubeconfig." />
+  <meta name="theme-color" content="#0a0a0a" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%230a0a0a'/><text x='16' y='22' font-family='monospace' font-size='16' fill='%2300e599' text-anchor='middle'>0x</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <a href="#main" style="position:absolute;left:-9999px" class="skip">skip to content</a>
+
+  <header class="top">
+    <div class="logo"><a href="../" style="color:inherit;text-decoration:none">unsigned<b>.gg</b></a><span>/learn</span></div>
+    <div class="top-right">
+      <span class="gate-chip unverified" aria-live="polite"><span class="led"></span><span class="txt">GATE 0/3</span></span>
+      <button class="kbd-hint" aria-label="open command bar">⌘K command bar</button>
+    </div>
+  </header>
+
+  <nav class="rail" aria-label="sections"></nav>
+
+  <main id="main" tabindex="-1" aria-live="polite"></main>
+
+  <div class="palette-wrap" role="dialog" aria-modal="true" aria-label="command bar">
+    <div class="scrim"></div>
+    <div class="palette">
+      <input type="text" placeholder="jump to a section, or type a command…" aria-label="command bar input"
+             role="combobox" aria-expanded="true" spellcheck="false" autocomplete="off" />
+      <ul role="listbox"></ul>
+    </div>
+  </div>
+
+  <noscript>
+    <main style="margin:80px auto;max-width:640px;padding:0 24px">
+      <h1>unsigned/learn needs JavaScript</h1>
+      <p>The explainers are interactive by design — there is no static fallback worth reading.
+      The access tutorial lives in the platform repo at
+      <code>awesome-unsigned/onboarding/platform-access.md</code>.</p>
+    </main>
+  </noscript>
+
+  <script src="app.js"></script>
+</body>
+</html>
