@@ -10,6 +10,9 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+    /* ── unsigned brand tokens — SOURCE OF TRUTH ─────────────────────────
+       Mirrored into unsigned-paas cluster-control-panel (OPS-161) and the
+       claude.ai "unsigned" design project. Change values here → propagate. */
     :root {
       --bg: #0a0a0a;
       --surface: #111111;
@@ -29,9 +32,12 @@
       --red: #ef4444;
       --mono: 'JetBrains Mono', monospace;
       --sans: 'Inter', -apple-system, sans-serif;
+      --gutter: clamp(24px, 5vw, 64px);
+      --measure: 1200px;
     }
 
     html { scroll-behavior: smooth; }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 
     body {
       background: var(--bg);
@@ -43,7 +49,7 @@
       overflow-x: hidden;
     }
 
-    /* GRID BG */
+    /* engineering grid backdrop */
     body::after {
       content: '';
       position: fixed;
@@ -56,37 +62,43 @@
       z-index: 0;
     }
 
-    /* NAV */
+    ::selection { background: var(--green-dim); color: var(--green); }
+
+    .wrap {
+      max-width: var(--measure);
+      margin: 0 auto;
+      padding-left: var(--gutter);
+      padding-right: var(--gutter);
+    }
+
+    /* ── NAV ─────────────────────────────────────────────────────────── */
     nav {
       position: fixed;
       top: 0; left: 0; right: 0;
       z-index: 100;
+      border-bottom: 1px solid var(--border);
+      background: rgba(10,10,10,0.92);
+      backdrop-filter: blur(20px);
+    }
+    .nav-inner {
+      max-width: var(--measure);
+      margin: 0 auto;
+      padding: 16px var(--gutter);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 20px 48px;
-      border-bottom: 1px solid var(--border);
-      background: rgba(10,10,10,0.9);
-      backdrop-filter: blur(20px);
+      gap: 24px;
     }
-
     .nav-logo {
       font-family: var(--mono);
-      font-size: 18px;
+      font-size: 17px;
       font-weight: 500;
       color: var(--white);
       text-decoration: none;
       letter-spacing: -0.02em;
     }
-
     .nav-logo span { color: var(--green); }
-
-    .nav-right {
-      display: flex;
-      align-items: center;
-      gap: 28px;
-    }
-
+    .nav-right { display: flex; align-items: center; gap: 24px; }
     .nav-link {
       font-family: var(--mono);
       font-size: 12px;
@@ -95,9 +107,8 @@
       letter-spacing: 0.05em;
       transition: color 0.2s;
     }
-
     .nav-link:hover { color: var(--green); }
-
+    .nav-link .idx { color: var(--green); opacity: 0.7; margin-right: 4px; }
     .nav-status {
       display: flex;
       align-items: center;
@@ -107,7 +118,6 @@
       color: var(--dim);
       letter-spacing: 0.05em;
     }
-
     .status-dot {
       width: 6px; height: 6px;
       border-radius: 50%;
@@ -115,70 +125,53 @@
       box-shadow: 0 0 8px var(--green);
       animation: pulse 2s infinite;
     }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    @media (prefers-reduced-motion: reduce) { .status-dot { animation: none; } }
 
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
-    }
-
-    /* HERO */
+    /* ── HERO ────────────────────────────────────────────────────────── */
     .hero {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding: 120px 48px 80px;
       position: relative;
       z-index: 1;
+      padding: clamp(120px, 16vh, 170px) 0 0;
     }
-
-    .hero-badge {
-      display: inline-flex;
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      gap: clamp(32px, 5vw, 72px);
       align-items: center;
-      gap: 8px;
-      font-family: var(--mono);
-      font-size: 11px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--green);
-      background: var(--green-dim);
-      border: 1px solid rgba(0,229,153,0.15);
-      padding: 6px 14px;
-      margin-bottom: 32px;
-      width: fit-content;
     }
-
     .hero-headline {
-      font-size: clamp(48px, 7vw, 96px);
+      font-size: clamp(40px, 5.4vw, 72px);
       font-weight: 600;
-      line-height: 1.05;
+      line-height: 1.04;
       letter-spacing: -0.03em;
-      margin-bottom: 28px;
-      max-width: 900px;
+      margin-bottom: 24px;
     }
-
-    .hero-headline .gradient {
-      background: linear-gradient(135deg, var(--green), var(--blue));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+    .hero-headline .accent { color: var(--green); }
+    .hero-headline .strike {
+      position: relative;
+      color: var(--dim);
+      white-space: nowrap;
     }
-
+    .hero-headline .strike::after {
+      content: '';
+      position: absolute;
+      left: -2%; right: -2%;
+      top: 54%;
+      height: 3px;
+      background: var(--green);
+      transform: rotate(-1.2deg);
+    }
     .hero-sub {
-      font-size: 18px;
+      font-size: 16px;
       color: var(--mid);
       line-height: 1.7;
-      max-width: 580px;
-      margin-bottom: 48px;
+      max-width: 480px;
+      margin-bottom: 36px;
       font-weight: 300;
     }
-
-    .hero-cta {
-      display: flex;
-      gap: 16px;
-      margin-bottom: 80px;
-    }
-
+    .hero-sub strong { color: var(--bright); font-weight: 500; }
+    .hero-cta { display: flex; gap: 14px; flex-wrap: wrap; }
     .btn-primary {
       background: var(--green);
       color: var(--bg);
@@ -189,15 +182,11 @@
       font-weight: 500;
       letter-spacing: 0.02em;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: background 0.2s, transform 0.2s;
       text-decoration: none;
+      display: inline-block;
     }
-
-    .btn-primary:hover {
-      background: var(--white);
-      transform: translateY(-1px);
-    }
-
+    .btn-primary:hover { background: var(--white); transform: translateY(-1px); }
     .btn-ghost {
       border: 1px solid var(--border);
       background: transparent;
@@ -207,50 +196,37 @@
       font-size: 13px;
       letter-spacing: 0.02em;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: border-color 0.2s, color 0.2s;
       text-decoration: none;
+      display: inline-block;
     }
+    .btn-ghost:hover { border-color: var(--green); color: var(--green); }
 
-    .btn-ghost:hover {
-      border-color: var(--green);
-      color: var(--green);
-    }
-
-    /* TERMINAL */
+    /* terminal — plain engineering chrome, no theater */
     .hero-terminal {
-      max-width: 680px;
       border: 1px solid var(--border);
+      border-top: 2px solid var(--green);
       background: var(--surface);
     }
-
     .term-bar {
-      padding: 10px 16px;
+      padding: 9px 16px;
       border-bottom: 1px solid var(--border);
       display: flex;
+      justify-content: space-between;
       align-items: center;
-      gap: 8px;
-    }
-
-    .term-dot { width: 8px; height: 8px; border-radius: 50%; }
-    .term-dot:nth-child(1) { background: #ff5f57; }
-    .term-dot:nth-child(2) { background: #febc2e; }
-    .term-dot:nth-child(3) { background: #28c840; }
-
-    .term-title {
-      margin-left: auto;
       font-family: var(--mono);
       font-size: 10px;
       color: var(--dim);
       letter-spacing: 0.08em;
     }
-
+    .term-bar .term-live { color: var(--green); }
     .term-body {
       padding: 20px;
       font-family: var(--mono);
       font-size: 12px;
       line-height: 2;
+      overflow-x: auto;
     }
-
     .t-prompt { color: var(--green); }
     .t-cmd { color: var(--bright); }
     .t-out { color: var(--mid); }
@@ -259,7 +235,6 @@
     .t-blue { color: var(--blue); }
     .t-purple { color: var(--purple); }
     .t-orange { color: var(--orange); }
-
     .t-cursor {
       display: inline-block;
       width: 7px; height: 13px;
@@ -268,160 +243,143 @@
       vertical-align: middle;
       margin-left: 2px;
     }
+    @keyframes blink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+    @media (prefers-reduced-motion: reduce) { .t-cursor { animation: none; } }
 
-    @keyframes blink {
-      0%, 49% { opacity: 1; }
-      50%, 100% { opacity: 0; }
+    /* readout strip under the hero — the platform in one mono line */
+    .readout {
+      margin-top: clamp(48px, 8vh, 80px);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background: rgba(17,17,17,0.5);
     }
-
-    /* SECTIONS */
-    section { position: relative; z-index: 1; }
-
-    .section-label {
+    .readout-inner {
+      max-width: var(--measure);
+      margin: 0 auto;
+      padding: 14px var(--gutter);
+      display: flex;
+      gap: clamp(18px, 4vw, 48px);
       font-family: var(--mono);
       font-size: 11px;
+      letter-spacing: 0.06em;
+      color: var(--dim);
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+    .readout-inner b { color: var(--green); font-weight: 400; }
+
+    /* ── SECTION SCAFFOLD ───────────────────────────────────────────── */
+    section { position: relative; z-index: 1; }
+    .sec {
+      padding: clamp(72px, 11vh, 120px) 0;
+      border-top: 1px solid var(--border);
+    }
+    .sec:first-of-type { border-top: none; }
+    .sec-head {
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+      margin-bottom: clamp(36px, 6vh, 56px);
+    }
+    .sec-idx {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--green);
+      letter-spacing: 0.1em;
+    }
+    .sec-title {
+      font-size: clamp(28px, 3.6vw, 44px);
+      font-weight: 600;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+    .sec-sub {
+      font-size: 14px;
+      color: var(--dim);
+      max-width: 520px;
+      margin-top: 12px;
+    }
+
+    /* ── 01 CAPABILITIES — ledger, not card grid ────────────────────── */
+    .ledger { border-top: 1px solid var(--border); }
+    .ledger-row {
+      display: grid;
+      grid-template-columns: 72px minmax(180px, 300px) 1fr;
+      gap: clamp(16px, 3vw, 40px);
+      padding: 26px 0;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.2s;
+    }
+    .ledger-row:hover { background: var(--green-glow); }
+    .ledger-no {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--dim);
+      padding-top: 4px;
+    }
+    .ledger-row:hover .ledger-no { color: var(--green); }
+    .ledger-title {
+      font-size: 17px;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      line-height: 1.35;
+    }
+    .ledger-desc {
+      font-size: 13.5px;
+      color: var(--dim);
+      line-height: 1.75;
+      max-width: 60ch;
+    }
+    .ledger-desc code {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--mid);
+    }
+
+    /* ── 02 STACK — spec sheet grouped by plane ─────────────────────── */
+    .spec { border: 1px solid var(--border); background: var(--surface); }
+    .spec-group { border-bottom: 1px solid var(--border); }
+    .spec-group:last-child { border-bottom: none; }
+    .spec-group-head {
+      padding: 12px 20px;
+      font-family: var(--mono);
+      font-size: 10px;
       letter-spacing: 0.15em;
       text-transform: uppercase;
       color: var(--green);
-      margin-bottom: 16px;
+      background: rgba(0,229,153,0.04);
+      border-bottom: 1px solid var(--border);
     }
-
-    /* FEATURES */
-    .features {
-      padding: 120px 48px;
-      border-top: 1px solid var(--border);
-    }
-
-    .features-header {
-      margin-bottom: 64px;
-      max-width: 500px;
-    }
-
-    .features-title {
-      font-size: clamp(32px, 4vw, 48px);
-      font-weight: 600;
-      line-height: 1.1;
-      letter-spacing: -0.02em;
-    }
-
-    .features-grid {
+    .spec-rows {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1px;
-      background: var(--border);
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     }
-
-    .feature {
-      background: var(--bg);
-      padding: 40px 32px;
-      transition: background 0.3s;
-      position: relative;
-    }
-
-    .feature:hover { background: var(--surface); }
-
-    .feature-icon {
-      font-family: var(--mono);
-      font-size: 11px;
-      color: var(--green);
-      background: var(--green-dim);
-      padding: 4px 10px;
-      display: inline-block;
-      margin-bottom: 20px;
-      letter-spacing: 0.05em;
-    }
-
-    .feature-title {
-      font-size: 18px;
-      font-weight: 500;
-      margin-bottom: 12px;
-      letter-spacing: -0.01em;
-    }
-
-    .feature-desc {
-      font-size: 13px;
-      color: var(--dim);
-      line-height: 1.8;
-    }
-
-    /* STACK */
-    .stack {
-      padding: 120px 48px;
-      border-top: 1px solid var(--border);
-    }
-
-    .stack-header {
+    .spec-row {
       display: flex;
       justify-content: space-between;
-      align-items: flex-end;
-      margin-bottom: 48px;
+      align-items: baseline;
+      gap: 12px;
+      padding: 14px 20px;
+      border-right: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      margin-right: -1px;
+      margin-bottom: -1px;
     }
-
-    .stack-title {
-      font-size: clamp(32px, 4vw, 48px);
-      font-weight: 600;
-      letter-spacing: -0.02em;
-      line-height: 1.1;
-    }
-
-    .stack-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 1px;
-      background: var(--border);
-    }
-
-    .stack-item {
-      background: var(--bg);
-      padding: 24px;
-      transition: background 0.2s;
-    }
-
-    .stack-item:hover { background: var(--surface); }
-
-    .stack-item-label {
+    .spec-key {
       font-family: var(--mono);
       font-size: 10px;
-      letter-spacing: 0.12em;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
       color: var(--dim);
-      margin-bottom: 8px;
     }
+    .spec-val { font-size: 13px; font-weight: 500; color: var(--bright); text-align: right; }
 
-    .stack-item-value {
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--bright);
-    }
-
-    /* ARCHITECTURE */
-    .arch {
-      padding: 120px 48px;
-      border-top: 1px solid var(--border);
-    }
-
-    .arch-header {
-      margin-bottom: 64px;
-    }
-
-    .arch-title {
-      font-size: clamp(32px, 4vw, 48px);
-      font-weight: 600;
-      letter-spacing: -0.02em;
-      line-height: 1.1;
-      margin-bottom: 16px;
-    }
-
-    .arch-sub {
-      font-size: 15px;
-      color: var(--dim);
-      max-width: 500px;
-    }
-
+    /* ── 03 ARCHITECTURE ────────────────────────────────────────────── */
     .arch-diagram {
       background: var(--surface);
       border: 1px solid var(--border);
-      padding: 40px;
+      border-left: 2px solid var(--green);
+      padding: clamp(20px, 4vw, 40px);
       font-family: var(--mono);
       font-size: 12px;
       line-height: 1.8;
@@ -430,196 +388,113 @@
       white-space: pre;
     }
 
-    /* PRICING TEASER */
-    .pricing {
-      padding: 120px 48px;
-      border-top: 1px solid var(--border);
+    /* ── 04 PRICING ─────────────────────────────────────────────────── */
+    .pricing-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 80px;
-      align-items: center;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+      gap: clamp(32px, 6vw, 80px);
+      align-items: start;
     }
-
-    .pricing-title {
-      font-size: clamp(32px, 4vw, 48px);
-      font-weight: 600;
-      letter-spacing: -0.02em;
-      line-height: 1.1;
-      margin-bottom: 20px;
-    }
-
     .pricing-desc {
       font-size: 15px;
-      color: var(--dim);
+      color: var(--mid);
       line-height: 1.8;
-      margin-bottom: 32px;
+      margin-bottom: 28px;
+      max-width: 52ch;
     }
-
-    .pricing-list {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
+    .pricing-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
     .pricing-list li {
       display: flex;
-      align-items: center;
+      align-items: baseline;
       gap: 12px;
       font-size: 14px;
       color: var(--mid);
     }
-
-    .pricing-list .check {
+    .pricing-list .check { color: var(--green); font-family: var(--mono); font-size: 12px; }
+    .pricing-note {
+      border: 1px solid var(--border);
+      border-left: 2px solid var(--green);
+      background: var(--surface);
+      padding: 24px 28px;
+    }
+    .pricing-note-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
       color: var(--green);
+      margin-bottom: 12px;
+    }
+    .pricing-note p { font-size: 13.5px; color: var(--mid); line-height: 1.8; }
+    .pricing-note p + p { margin-top: 10px; }
+    .pricing-note .skus {
+      margin-top: 16px;
       font-family: var(--mono);
-      font-size: 12px;
-    }
-
-    .pricing-right {
-      display: flex;
-      flex-direction: column;
-      gap: 1px;
-      background: var(--border);
-    }
-
-    .price-row {
-      background: var(--bg);
-      padding: 28px 32px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      transition: background 0.2s;
-    }
-
-    .price-row:hover { background: var(--surface); }
-
-    .price-label {
-      font-family: var(--mono);
-      font-size: 12px;
-      letter-spacing: 0.05em;
+      font-size: 11px;
       color: var(--dim);
+      line-height: 2;
     }
 
-    .price-value {
-      font-family: var(--mono);
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--green);
+    /* ── 05 ACCESS ──────────────────────────────────────────────────── */
+    .access { text-align: left; }
+    .access-inner {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+      gap: clamp(32px, 6vw, 80px);
+      align-items: center;
     }
-
-    /* WAITLIST */
-    .waitlist {
-      padding: 120px 48px;
-      border-top: 1px solid var(--border);
-      text-align: center;
-    }
-
-    .waitlist-inner {
-      max-width: 560px;
-      margin: 0 auto;
-    }
-
-    .waitlist-title {
-      font-size: clamp(36px, 5vw, 56px);
+    .access-title {
+      font-size: clamp(30px, 4.4vw, 52px);
       font-weight: 600;
       letter-spacing: -0.03em;
-      line-height: 1.1;
-      margin-bottom: 20px;
+      line-height: 1.08;
+      margin-bottom: 18px;
     }
-
-    .waitlist-desc {
+    .access-desc {
       font-size: 15px;
-      color: var(--dim);
+      color: var(--mid);
       line-height: 1.8;
-      margin-bottom: 40px;
+      max-width: 52ch;
+      margin-bottom: 32px;
     }
-
-    .waitlist-form {
-      display: flex;
-      gap: 1px;
-      margin-bottom: 16px;
-    }
-
-    .wl-input {
-      flex: 1;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-right: none;
-      color: var(--white);
-      font-family: var(--mono);
-      font-size: 13px;
-      padding: 16px 20px;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-
-    .wl-input::placeholder { color: var(--dim); }
-    .wl-input:focus { border-color: var(--green); }
-
-    .wl-submit {
-      background: var(--green);
-      color: var(--bg);
-      border: none;
-      padding: 16px 28px;
-      font-family: var(--mono);
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s;
-      white-space: nowrap;
-    }
-
-    .wl-submit:hover { background: var(--white); }
-
-    .wl-note {
+    .access-hint {
+      margin-top: 14px;
       font-size: 11px;
       color: var(--dim);
       letter-spacing: 0.03em;
-    }
-
-    .success-msg {
-      display: none;
-      padding: 14px 20px;
-      border: 1px solid var(--green);
-      background: var(--green-dim);
       font-family: var(--mono);
-      font-size: 13px;
-      color: var(--green);
-      margin-bottom: 16px;
     }
+    .access-aside {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      padding: 24px 28px;
+      font-family: var(--mono);
+      font-size: 11.5px;
+      line-height: 2.1;
+      color: var(--dim);
+    }
+    .access-aside .k { color: var(--green); }
 
-    /* FOOTER */
+    /* ── FOOTER ─────────────────────────────────────────────────────── */
     footer {
       border-top: 1px solid var(--border);
-      padding: 32px 48px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
       position: relative;
       z-index: 1;
     }
-
-    .footer-logo {
-      font-family: var(--mono);
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--white);
-    }
-
-    .footer-logo span { color: var(--green); }
-
-    .footer-copy {
-      font-size: 11px;
-      color: var(--dim);
-      letter-spacing: 0.03em;
-    }
-
-    .footer-links {
+    .footer-inner {
+      max-width: var(--measure);
+      margin: 0 auto;
+      padding: 32px var(--gutter);
       display: flex;
-      gap: 24px;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
     }
-
+    .footer-logo { font-family: var(--mono); font-size: 14px; font-weight: 500; color: var(--white); }
+    .footer-logo span { color: var(--green); }
+    .footer-copy { font-size: 11px; color: var(--dim); letter-spacing: 0.03em; margin-top: 4px; }
+    .footer-links { display: flex; gap: 24px; }
     .footer-links a {
       font-family: var(--mono);
       font-size: 11px;
@@ -627,37 +502,26 @@
       text-decoration: none;
       transition: color 0.2s;
     }
-
     .footer-links a:hover { color: var(--green); }
 
-    /* REVEAL */
+    /* ── REVEAL ─────────────────────────────────────────────────────── */
     .reveal {
       opacity: 0;
       transform: translateY(24px);
       transition: opacity 0.6s, transform 0.6s;
     }
-
-    .reveal.visible {
-      opacity: 1;
-      transform: translateY(0);
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { opacity: 1; transform: none; transition: none; }
     }
 
-    /* MOBILE */
+    /* ── MOBILE ─────────────────────────────────────────────────────── */
     @media (max-width: 900px) {
-      nav { padding: 16px 24px; }
-      .hero { padding: 100px 24px 60px; }
-      .features { padding: 80px 24px; }
-      .features-grid { grid-template-columns: 1fr; }
-      .stack { padding: 80px 24px; }
-      .stack-grid { grid-template-columns: 1fr 1fr; }
-      .arch { padding: 80px 24px; }
-      .arch-diagram { font-size: 10px; padding: 20px; }
-      .pricing { grid-template-columns: 1fr; gap: 48px; padding: 80px 24px; }
-      .waitlist { padding: 80px 24px; }
-      .waitlist-form { flex-direction: column; }
-      .wl-input { border-right: 1px solid var(--border); }
-      footer { flex-direction: column; gap: 20px; align-items: flex-start; padding: 24px; }
-      .hero-cta { flex-direction: column; }
+      .hero-grid { grid-template-columns: 1fr; }
+      .ledger-row { grid-template-columns: 48px 1fr; }
+      .ledger-desc { grid-column: 2; }
+      .pricing-grid, .access-inner { grid-template-columns: 1fr; }
+      .nav-link.hide-sm { display: none; }
     }
   </style>
 </head>
@@ -665,178 +529,176 @@
 
   <!-- NAV -->
   <nav>
-    <a href="#" class="nav-logo">unsigned<span>.</span>gg</a>
-    <div class="nav-right">
-      <a href="#features" class="nav-link">Features</a>
-      <a href="#stack" class="nav-link">Stack</a>
-      <a href="#pricing" class="nav-link">Pricing</a>
-      <div class="nav-status">
-        <div class="status-dot"></div>
-        Building
+    <div class="nav-inner">
+      <a href="#" class="nav-logo">unsigned<span>.</span>gg</a>
+      <div class="nav-right">
+        <a href="#capabilities" class="nav-link"><span class="idx">0x01</span>Capabilities</a>
+        <a href="#stack" class="nav-link hide-sm"><span class="idx">0x02</span>Stack</a>
+        <a href="#arch" class="nav-link hide-sm"><span class="idx">0x03</span>Architecture</a>
+        <a href="#pricing" class="nav-link"><span class="idx">0x04</span>Pricing</a>
+        <div class="nav-status">
+          <div class="status-dot"></div>
+          Building
+        </div>
       </div>
     </div>
   </nav>
 
   <!-- HERO -->
-  <section class="hero">
-    <div class="hero-badge">GPU Cloud Platform</div>
-    <h1 class="hero-headline">GPU compute,<br><span class="gradient">unsigned complexity.</span></h1>
-    <p class="hero-sub">Kubernetes-native AI/ML platform. Deploy inference endpoints and training jobs on GPU clusters with scale-to-zero, zero-trust networking, and no vendor lock-in.</p>
-
-    <div class="hero-cta">
-      <a href="#waitlist" class="btn-primary">Request Access</a>
-      <a href="#arch" class="btn-ghost">View Architecture</a>
-    </div>
-
-    <div class="hero-terminal">
-      <div class="term-bar">
-        <div class="term-dot"></div>
-        <div class="term-dot"></div>
-        <div class="term-dot"></div>
-        <span class="term-title">unsigned deploy</span>
-      </div>
-      <div class="term-body">
-        <span class="t-prompt">$ </span><span class="t-cmd">unsigned deploy --model llama-3.1-70b --gpu a100 --replicas 0:8</span><br>
-        <span class="t-out">Resolving model registry...</span><br>
-        <span class="t-green">&#10003;</span> <span class="t-out">Image pulled from Harbor (cached)</span><br>
-        <span class="t-green">&#10003;</span> <span class="t-out">GPU pool: 8x A100-80GB MIG (3g.40gb partitions)</span><br>
-        <span class="t-green">&#10003;</span> <span class="t-out">Autoscaler: KEDA + Kueue (0 &rarr; 8 replicas)</span><br>
-        <span class="t-green">&#10003;</span> <span class="t-out">Network: Cilium eBPF + WireGuard mTLS</span><br>
-        <span class="t-green">&#10003;</span> <span class="t-out">Endpoint: llama-70b.unsigned.gg</span><br>
-        <br>
-        <span class="t-green">&#10003;</span> <span class="t-cmd">Deployed.</span> <span class="t-dim">Scale-to-zero active. First request wakes in ~4s.</span><br>
-        <span class="t-prompt">$ </span><span class="t-cursor"></span>
-      </div>
-    </div>
-  </section>
-
-  <!-- FEATURES -->
-  <section class="features reveal" id="features">
-    <div class="features-header">
-      <p class="section-label">Why unsigned</p>
-      <h2 class="features-title">Infrastructure that gets out of your way.</h2>
-    </div>
-
-    <div class="features-grid">
-      <div class="feature">
-        <span class="feature-icon">GPU</span>
-        <h3 class="feature-title">Scale to zero, scale to thousands</h3>
-        <p class="feature-desc">KEDA + Kueue autoscaling with MIG-isolated GPU partitions. Pay nothing when idle. Burst to full cluster capacity on demand. No cold start tax beyond first request.</p>
-      </div>
-      <div class="feature">
-        <span class="feature-icon">NET</span>
-        <h3 class="feature-title">Zero-trust by default</h3>
-        <p class="feature-desc">Cilium eBPF dataplane with WireGuard-encrypted pod-to-pod traffic. Network policies enforced at the kernel level. mTLS everywhere, no sidecars.</p>
-      </div>
-      <div class="feature">
-        <span class="feature-icon">OBS</span>
-        <h3 class="feature-title">Full observability stack</h3>
-        <p class="feature-desc">Prometheus, Grafana, Loki, and Jaeger pre-configured. GPU utilization, inference latency, and cost dashboards out of the box. Alert on what matters.</p>
-      </div>
-      <div class="feature">
-        <span class="feature-icon">SEC</span>
-        <h3 class="feature-title">Secrets & policy as code</h3>
-        <p class="feature-desc">HashiCorp Vault for secrets management. OPA Gatekeeper for admission control. External Secrets Operator syncs credentials. Nothing hardcoded, ever.</p>
-      </div>
-      <div class="feature">
-        <span class="feature-icon">GIT</span>
-        <h3 class="feature-title">GitOps everything</h3>
-        <p class="feature-desc">ArgoCD manages the full stack. Every change is a pull request. Every deployment is auditable. Rollback is a git revert.</p>
-      </div>
-      <div class="feature">
-        <span class="feature-icon">API</span>
-        <h3 class="feature-title">OpenAI-compatible endpoints</h3>
-        <p class="feature-desc">NVIDIA Dynamo + Triton inference server. Drop-in replacement for OpenAI API. Bring your own models or pull from our registry. One endpoint, any framework.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- STACK -->
-  <section class="stack reveal" id="stack">
-    <div class="stack-header">
+  <header class="hero">
+    <div class="wrap hero-grid">
       <div>
-        <p class="section-label">Under the hood</p>
-        <h2 class="stack-title">Production-grade, opinionated stack.</h2>
+        <h1 class="hero-headline">GPU compute,<br><span class="strike">signed</span> <span class="accent">unsigned</span><br>complexity.</h1>
+        <p class="hero-sub">A Kubernetes-native AI/ML platform. Deploy inference endpoints and training jobs on GPU clusters with <strong>scale-to-zero</strong>, <strong>zero-trust networking</strong>, and <strong>no vendor lock-in</strong> — every layer is open source and replaceable.</p>
+        <div class="hero-cta">
+          <a href="#access" class="btn-primary">Request Access</a>
+          <a href="#arch" class="btn-ghost">View Architecture</a>
+        </div>
+      </div>
+
+      <div class="hero-terminal" aria-label="example deploy session">
+        <div class="term-bar">
+          <span>unsigned deploy — session</span>
+          <span class="term-live">● live</span>
+        </div>
+        <div class="term-body">
+<span class="t-prompt">$ </span><span class="t-cmd">unsigned deploy --model llama-3.1-70b --gpu a100 --precision bf16 --replicas 0:8</span><br>
+<span class="t-out">Resolving model registry...</span><br>
+<span class="t-green">&#10003;</span> <span class="t-out">Image pulled from Harbor (cached)</span><br>
+<span class="t-green">&#10003;</span> <span class="t-out">GPU pool: 8x A100-80GB MIG (3g.40gb partitions)</span><br>
+<span class="t-green">&#10003;</span> <span class="t-out">Autoscaler: KEDA + Kueue (0 &rarr; 8 replicas)</span><br>
+<span class="t-green">&#10003;</span> <span class="t-out">Network: Cilium eBPF + WireGuard mTLS</span><br>
+<span class="t-green">&#10003;</span> <span class="t-out">Endpoint: llama-70b.unsigned.gg</span><br>
+<br>
+<span class="t-green">&#10003;</span> <span class="t-cmd">Deployed.</span> <span class="t-dim">Scale-to-zero active. First request wakes in ~4s.</span><br>
+<span class="t-prompt">$ </span><span class="t-cursor"></span>
+        </div>
       </div>
     </div>
 
-    <div class="stack-grid">
-      <div class="stack-item">
-        <div class="stack-item-label">Compute</div>
-        <div class="stack-item-value">Vultr VKE</div>
+    <!-- readout strip -->
+    <div class="readout">
+      <div class="readout-inner">
+        <span>idle cost <b>$0</b></span>
+        <span>pod-to-pod <b>WireGuard mTLS</b></span>
+        <span>rollback <b>git revert</b></span>
+        <span>precision <b>bf16 / int8</b></span>
+        <span>API <b>OpenAI-compatible</b></span>
+        <span>exit path <b>fork the stack</b></span>
+        <span>endian <b>little, like nature intended</b></span>
       </div>
-      <div class="stack-item">
-        <div class="stack-item-label">Orchestration</div>
-        <div class="stack-item-value">Kubernetes</div>
+    </div>
+  </header>
+
+  <!-- 01 CAPABILITIES -->
+  <section class="sec reveal" id="capabilities">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="sec-idx">0x01</span>
+        <div>
+          <h2 class="sec-title">Infrastructure that gets out of your way.</h2>
+        </div>
       </div>
-      <div class="stack-item">
-        <div class="stack-item-label">IaC</div>
-        <div class="stack-item-value">Terraform</div>
-      </div>
-      <div class="stack-item">
-        <div class="stack-item-label">GitOps</div>
-        <div class="stack-item-value">ArgoCD</div>
-      </div>
-      <div class="stack-item">
-        <div class="stack-item-label">Network</div>
-        <div class="stack-item-value">Cilium eBPF</div>
-      </div>
-      <div class="stack-item">
-        <div class="stack-item-label">Ingress</div>
-        <div class="stack-item-value">Traefik</div>
-      </div>
-      <div class="stack-item">
-        <div class="stack-item-label">API Gateway</div>
-        <div class="stack-item-value">Kong</div>
-      </div>
-      <div class="stack-item">
-        <div class="stack-item-label">Encryption</div>
-        <div class="stack-item-value">WireGuard mTLS</div>
-      </div>
-      <div class="stack-item">
-        <div class="stack-item-label">GPU Inference</div>
-        <div class="stack-item-value">Dynamo + Triton</div>
-      </div>
-      <div class="stack-item">
-        <div class="stack-item-label">Autoscaling</div>
-        <div class="stack-item-value">KEDA + Kueue</div>
-      </div>
-      <div class="stack-item">
-        <div class="stack-item-label">Secrets</div>
-        <div class="stack-item-value">Vault + ESO</div>
-      </div>
-      <div class="stack-item">
-        <div class="stack-item-label">Policy</div>
-        <div class="stack-item-value">OPA Gatekeeper</div>
-      </div>
-      <div class="stack-item">
-        <div class="stack-item-label">Auth</div>
-        <div class="stack-item-value">Keycloak</div>
-      </div>
-      <div class="stack-item">
-        <div class="stack-item-label">Registry</div>
-        <div class="stack-item-value">Harbor</div>
-      </div>
-      <div class="stack-item">
-        <div class="stack-item-label">Monitoring</div>
-        <div class="stack-item-value">Prometheus + Grafana</div>
-      </div>
-      <div class="stack-item">
-        <div class="stack-item-label">Tracing</div>
-        <div class="stack-item-value">Jaeger</div>
+
+      <div class="ledger">
+        <div class="ledger-row">
+          <span class="ledger-no">/01</span>
+          <h3 class="ledger-title">Scale to zero, scale to thousands</h3>
+          <p class="ledger-desc">KEDA + Kueue autoscaling with MIG-isolated GPU partitions. Pay nothing when idle. Burst to full cluster capacity on demand. No cold-start tax beyond the first request. Replica counts are unsigned — there is no going below zero.</p>
+        </div>
+        <div class="ledger-row">
+          <span class="ledger-no">/02</span>
+          <h3 class="ledger-title">Zero-trust by default</h3>
+          <p class="ledger-desc">Cilium eBPF dataplane with WireGuard-encrypted pod-to-pod traffic. Network policies enforced at the kernel level. mTLS everywhere, no sidecars.</p>
+        </div>
+        <div class="ledger-row">
+          <span class="ledger-no">/03</span>
+          <h3 class="ledger-title">Full observability stack</h3>
+          <p class="ledger-desc">Prometheus, Grafana, Loki, and Jaeger pre-configured. GPU utilization, inference latency, and cost dashboards out of the box. Alert on what matters.</p>
+        </div>
+        <div class="ledger-row">
+          <span class="ledger-no">/04</span>
+          <h3 class="ledger-title">Secrets &amp; policy as code</h3>
+          <p class="ledger-desc">Vault for secrets management, OPA Gatekeeper for admission control, External Secrets Operator syncing credentials. Nothing hardcoded, ever.</p>
+        </div>
+        <div class="ledger-row">
+          <span class="ledger-no">/05</span>
+          <h3 class="ledger-title">GitOps everything</h3>
+          <p class="ledger-desc">ArgoCD manages the full stack. Every change is a pull request. Every deployment is auditable. Rollback is a <code>git revert</code>.</p>
+        </div>
+        <div class="ledger-row">
+          <span class="ledger-no">/06</span>
+          <h3 class="ledger-title">OpenAI-compatible endpoints</h3>
+          <p class="ledger-desc">NVIDIA Dynamo + Triton inference serving. Drop-in replacement for the OpenAI API — bring your own models or pull from the registry. One endpoint, any framework.</p>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- ARCHITECTURE -->
-  <section class="arch reveal" id="arch">
-    <div class="arch-header">
-      <p class="section-label">Architecture</p>
-      <h2 class="arch-title">From request to inference.</h2>
-      <p class="arch-sub">Every layer is replaceable. No proprietary glue. Fork the stack and run it yourself.</p>
-    </div>
+  <!-- 02 STACK -->
+  <section class="sec reveal" id="stack">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="sec-idx">0x02</span>
+        <div>
+          <h2 class="sec-title">Production-grade, opinionated stack.</h2>
+          <p class="sec-sub">Every component is open source. The platform is the integration, not the lock-in.</p>
+        </div>
+      </div>
 
-    <div class="arch-diagram"><span class="t-dim">               Request Flow</span>
+      <div class="spec">
+        <div class="spec-group">
+          <div class="spec-group-head">Edge &amp; network plane</div>
+          <div class="spec-rows">
+            <div class="spec-row"><span class="spec-key">Ingress</span><span class="spec-val">Traefik</span></div>
+            <div class="spec-row"><span class="spec-key">API Gateway</span><span class="spec-val">Kong</span></div>
+            <div class="spec-row"><span class="spec-key">Network</span><span class="spec-val">Cilium eBPF</span></div>
+            <div class="spec-row"><span class="spec-key">Encryption</span><span class="spec-val">WireGuard mTLS</span></div>
+          </div>
+        </div>
+        <div class="spec-group">
+          <div class="spec-group-head">Control plane</div>
+          <div class="spec-rows">
+            <div class="spec-row"><span class="spec-key">Orchestration</span><span class="spec-val">Kubernetes</span></div>
+            <div class="spec-row"><span class="spec-key">GitOps</span><span class="spec-val">ArgoCD</span></div>
+            <div class="spec-row"><span class="spec-key">IaC</span><span class="spec-val">Terraform</span></div>
+            <div class="spec-row"><span class="spec-key">Auth</span><span class="spec-val">Keycloak</span></div>
+            <div class="spec-row"><span class="spec-key">Secrets</span><span class="spec-val">Vault + ESO</span></div>
+            <div class="spec-row"><span class="spec-key">Policy</span><span class="spec-val">OPA Gatekeeper</span></div>
+          </div>
+        </div>
+        <div class="spec-group">
+          <div class="spec-group-head">Inference plane</div>
+          <div class="spec-rows">
+            <div class="spec-row"><span class="spec-key">GPU Serving</span><span class="spec-val">Dynamo + Triton</span></div>
+            <div class="spec-row"><span class="spec-key">Autoscaling</span><span class="spec-val">KEDA + Kueue</span></div>
+            <div class="spec-row"><span class="spec-key">Registry</span><span class="spec-val">Harbor</span></div>
+          </div>
+        </div>
+        <div class="spec-group">
+          <div class="spec-group-head">Observability plane</div>
+          <div class="spec-rows">
+            <div class="spec-row"><span class="spec-key">Metrics</span><span class="spec-val">Prometheus + Grafana</span></div>
+            <div class="spec-row"><span class="spec-key">Logs</span><span class="spec-val">Loki</span></div>
+            <div class="spec-row"><span class="spec-key">Tracing</span><span class="spec-val">Jaeger</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 ARCHITECTURE -->
+  <section class="sec reveal" id="arch">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="sec-idx">0x03</span>
+        <div>
+          <h2 class="sec-title">From request to inference.</h2>
+          <p class="sec-sub">Every layer is replaceable. No proprietary glue. Fork the stack and run it yourself.</p>
+        </div>
+      </div>
+
+      <div class="arch-diagram"><span class="t-dim">               Request Flow</span>
 
 <span class="t-blue">Client</span>
   │
@@ -867,100 +729,90 @@
             │
             ▼
        <span class="t-green">A100 / H100 GPU</span> <span class="t-dim">(MIG-partitioned, scale-to-zero)</span></div>
+    </div>
   </section>
 
-  <!-- PRICING -->
-  <section class="pricing reveal" id="pricing">
-    <div>
-      <p class="section-label">Pricing</p>
-      <h2 class="pricing-title">Pay for compute, not complexity.</h2>
-      <p class="pricing-desc">No platform fees. No egress charges. No surprise bills. You pay for GPU-seconds consumed. Scale to zero = $0.</p>
-      <ul class="pricing-list">
-        <li><span class="check">&#10003;</span> Per-second GPU billing</li>
-        <li><span class="check">&#10003;</span> Scale-to-zero (no idle cost)</li>
-        <li><span class="check">&#10003;</span> Free ingress and egress</li>
-        <li><span class="check">&#10003;</span> Full observability included</li>
-        <li><span class="check">&#10003;</span> No seat-based pricing</li>
-        <li><span class="check">&#10003;</span> Open source stack — exit anytime</li>
-      </ul>
-    </div>
-    <div class="pricing-right">
-      <div class="price-row">
-        <span class="price-label">A100 80GB (MIG 3g.40gb)</span>
-        <span class="price-value">Coming soon</span>
+  <!-- 04 PRICING -->
+  <section class="sec reveal" id="pricing">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="sec-idx">0x04</span>
+        <div>
+          <h2 class="sec-title">Pay for compute, not complexity.</h2>
+        </div>
       </div>
-      <div class="price-row">
-        <span class="price-label">A100 80GB (full)</span>
-        <span class="price-value">Coming soon</span>
-      </div>
-      <div class="price-row">
-        <span class="price-label">H100 80GB (MIG)</span>
-        <span class="price-value">Coming soon</span>
-      </div>
-      <div class="price-row">
-        <span class="price-label">H100 80GB (full)</span>
-        <span class="price-value">Coming soon</span>
-      </div>
-      <div class="price-row">
-        <span class="price-label">CPU (general)</span>
-        <span class="price-value">Coming soon</span>
+
+      <div class="pricing-grid">
+        <div>
+          <p class="pricing-desc">No platform fees. No egress charges. No surprise bills. You pay for GPU-seconds consumed — and scale-to-zero means idle costs exactly <strong style="color:var(--green)">$0</strong> — an honest, unsigned zero.</p>
+          <ul class="pricing-list">
+            <li><span class="check">&#10003;</span> Per-second GPU billing</li>
+            <li><span class="check">&#10003;</span> Scale-to-zero (no idle cost)</li>
+            <li><span class="check">&#10003;</span> Free ingress and egress</li>
+            <li><span class="check">&#10003;</span> Full observability included</li>
+            <li><span class="check">&#10003;</span> No seat-based pricing</li>
+            <li><span class="check">&#10003;</span> Open source stack — exit anytime</li>
+          </ul>
+        </div>
+        <div class="pricing-note">
+          <div class="pricing-note-label">Rate card</div>
+          <p>Per-second rates publish with the public beta. Founding teams lock their rates in before launch — that lock survives GA.</p>
+          <p class="skus">
+            A100 80GB · MIG 3g.40gb + full<br>
+            H100 80GB · MIG + full<br>
+            CPU · general purpose
+          </p>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- WAITLIST -->
-  <section class="waitlist reveal" id="waitlist">
-    <div class="waitlist-inner">
-      <p class="section-label">Early Access</p>
-      <h2 class="waitlist-title">Get on the list.</h2>
-      <p class="waitlist-desc">We're onboarding a small group of teams for the private beta. Founding users get locked-in pricing and direct access to the engineering team.</p>
-
-      <div class="success-msg" id="successMsg">&#10003; You're in. We'll reach out soon.</div>
-
-      <div class="waitlist-form">
-        <input class="wl-input" type="email" id="emailInput" placeholder="you@company.com" />
-        <button class="wl-submit" onclick="handleSubmit()">Join Waitlist</button>
+  <!-- 05 ACCESS -->
+  <section class="sec reveal" id="access">
+    <div class="wrap access-inner">
+      <div>
+        <p class="sec-idx" style="margin-bottom:14px">0x05 · Early access</p>
+        <h2 class="access-title">Get on the list.</h2>
+        <p class="access-desc">We're onboarding a small group of teams for the private beta. Founding users get locked-in pricing and direct access to the engineering team.</p>
+        <a class="btn-primary" href="mailto:chris@todie.io?subject=unsigned.gg%20early%20access&body=Team%2C%20workload%2C%20and%20GPU%20needs%3A">Request Access</a>
+        <p class="access-hint">opens your mail client — tell us your team, workload, and GPU needs</p>
       </div>
-      <p class="wl-note">No spam. Early access and launch updates only.</p>
+      <div class="access-aside" aria-label="what to include">
+        <span class="k">$</span> cat request-template.txt<br>
+        <span class="k">→</span> team &amp; company<br>
+        <span class="k">→</span> workload (inference / training / both)<br>
+        <span class="k">→</span> models &amp; expected QPS<br>
+        <span class="k">→</span> current GPU spend, if any
+      </div>
     </div>
   </section>
 
   <!-- FOOTER -->
   <footer>
-    <div>
-      <div class="footer-logo">unsigned<span>.</span>gg</div>
-      <div class="footer-copy">&copy; 2026 unsigned.gg &middot; All rights reserved.</div>
-    </div>
-    <div class="footer-links">
-      <a href="mailto:chris@todie.io">Contact</a>
-      <a href="#">Docs</a>
-      <a href="https://github.com/2die4-inc">GitHub</a>
+    <div class="footer-inner">
+      <div>
+        <div class="footer-logo">unsigned<span>.</span>gg</div>
+        <div class="footer-copy">&copy; 2026 unsigned.gg &middot; all rights reserved &middot; big ideas, little endian</div>
+      </div>
+      <div class="footer-links">
+        <a href="mailto:chris@todie.io">Contact</a>
+        <a href="https://github.com/unsigned-gg">GitHub</a>
+      </div>
     </div>
   </footer>
 
   <script>
     const reveals = document.querySelectorAll('.reveal');
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(e => {
-        if (e.isIntersecting) e.target.classList.add('visible');
-      });
-    }, { threshold: 0.1 });
-    reveals.forEach(r => observer.observe(r));
-
-    function handleSubmit() {
-      const email = document.getElementById('emailInput').value;
-      if (!email || !email.includes('@')) {
-        document.getElementById('emailInput').style.borderColor = '#ef4444';
-        return;
-      }
-      document.getElementById('emailInput').style.borderColor = '';
-      document.getElementById('successMsg').style.display = 'block';
-      document.getElementById('emailInput').value = '';
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      reveals.forEach(r => r.classList.add('visible'));
+    } else {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+          if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }
+        });
+      }, { threshold: 0.1 });
+      reveals.forEach(r => observer.observe(r));
     }
-
-    document.getElementById('emailInput').addEventListener('keydown', e => {
-      if (e.key === 'Enter') handleSubmit();
-    });
   </script>
 </body>
 </html>
