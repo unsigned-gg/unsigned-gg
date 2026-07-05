@@ -1,0 +1,43 @@
+# design-sync detector — flags PRs that touch design-surface files listed in
+# any .design-sync.json manifest, so the merging session knows to run
+# /design-sync afterward. Non-blocking; comment is posted once per PR.
+name: design-sync-detector
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+permissions:
+  pull-requests: write
+  contents: read
+jobs:
+  detect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Detect design-surface changes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+          BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          set -euo pipefail
+          changed=$(git diff --name-only "$BASE"...HEAD)
+          hits=""
+          for manifest in $(git ls-files '.design-sync.json' '*/.design-sync.json'); do
+            dir=$(dirname "$manifest")
+            for src in $(jq -r '.files[].src' "$manifest"); do
+              rel="$src"; [ "$dir" != "." ] && rel="$dir/$src"
+              if grep -qxF "$rel" <<<"$changed"; then
+                hits="$hits"$'\n'"- \`$rel\`"
+              fi
+            done
+          done
+          [ -z "$hits" ] && { echo "no design-surface changes"; exit 0; }
+          marker="<!-- design-sync-detector -->"
+          if gh pr view "$PR" --json comments -q '.comments[].body' | grep -qF "$marker"; then
+            echo "already flagged"; exit 0
+          fi
+          gh pr comment "$PR" --body "$marker
+          **Design surface changed** — run \`/design-sync\` in a session after this merges (mirrors the files below to the claude.ai design project).
+          $hits"
