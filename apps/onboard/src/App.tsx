@@ -10,6 +10,7 @@ import GuidesIndex from "./pages/guides-index";
 import GuideDetail from "./pages/guide-detail";
 import OperatorCohort from "./pages/operator-cohort";
 import OperatorUser from "./pages/operator-user";
+import ModulePlayer from "./pages/module-player";
 
 function Callback() {
   const nav = useNavigate();
@@ -72,6 +73,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<TrackView />} />
         <Route path="/steps/:slug" element={<StepDetail />} />
+        <Route path="/modules/:slug" element={<ModulePlayer />} />
         <Route path="/guides" element={<GuidesIndex />} />
         <Route path="/guides/:slug" element={<GuideDetail />} />
         <Route path="/operator" element={<OperatorCohort />} />

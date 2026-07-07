@@ -59,7 +59,17 @@ export default function StepDetail() {
           </div>
         )}
 
-        {step.state !== "verified" && step.ownership === "engineer-owed" && step.slug !== "access-kubeconfig" && (
+        {/* Module steps complete via the quiz, not a verifier poll. */}
+        {step.track === "modules" && (
+          <Link
+            to={`/modules/${step.slug}`}
+            className="mt-4 inline-block rounded border border-signal/40 bg-signal/10 px-4 py-1.5 text-signal"
+          >
+            {step.state === "verified" ? "review module" : "take module quiz"}
+          </Link>
+        )}
+
+        {step.track !== "modules" && step.state !== "verified" && step.ownership === "engineer-owed" && step.slug !== "access-kubeconfig" && (
           <button onClick={verifyNow} className="mt-4 rounded border border-signal/40 bg-signal/10 px-4 py-1.5 text-signal">
             verify now
           </button>
