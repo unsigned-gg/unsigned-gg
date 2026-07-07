@@ -1,7 +1,7 @@
 name: CI — Site compose
 
 # PR gate: the composed Pages artifact must build and carry the required
-# surfaces. Catches app build breakage and CNAME loss before main.
+# surfaces. Catches app build breakage before main.
 on:
   pull_request:
 
@@ -19,6 +19,6 @@ jobs:
       - name: Assert required surfaces
         run: |
           test -f _site/index.html
-          test -f _site/CNAME
           test -f _site/learn/index.html
-          grep -qx 'unsigned.gg' _site/CNAME
+          test -f _site/onboard/index.html
+          test -f _site/404.html

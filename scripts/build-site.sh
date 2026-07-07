@@ -7,8 +7,6 @@
 #   2. Built apps — every apps/<name>/ with a package.json is built with
 #      bun (vite) and published at /<name>/ on the site.
 #
-# CNAME must land in the artifact root or the unsigned.gg custom domain
-# detaches on the next deploy — ci-site.yml asserts it.
 set -euo pipefail
 
 OUT="${1:?usage: build-site.sh <out-dir>}"
@@ -20,7 +18,7 @@ mkdir -p "$OUT"
 # stray untracked file at repo root would go public (incident 2026-07-07:
 # untracked CSV + dotfiles shipped in a local direct-upload deployment).
 # New static surfaces must be added here deliberately.
-for f in index.html 404.html CNAME; do
+for f in index.html 404.html; do
   cp "$f" "$OUT/"
 done
 cp -r learn "$OUT/learn"
