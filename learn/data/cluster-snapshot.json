@@ -1,10 +1,10 @@
 {
   "demo": false,
-  "generatedAt": "2026-07-07T04:37:19Z",
+  "generatedAt": "2026-07-07T09:30:57Z",
   "nodesReady": 4,
   "nodesTotal": 4,
-  "appsSynced": 29,
-  "appsTotal": 54,
+  "appsSynced": 32,
+  "appsTotal": 57,
   "certValid": true,
   "k8s": "v1.34.5",
   "pools": {
