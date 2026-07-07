@@ -1,0 +1,13 @@
+{
+  "name": "unsigned/onboard",
+  "short_name": "onboard",
+  "description": "unsigned platform onboarding — verified progress.",
+  "start_url": "/onboard/",
+  "scope": "/onboard/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#0a0a0a",
+  "icons": [
+    { "src": "/onboard/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
