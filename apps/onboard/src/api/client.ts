@@ -24,6 +24,26 @@ export interface TrackStep {
   daysInState: number;
 }
 
+export interface Question {
+  id: string;
+  prompt: string;
+  choices: string[];
+}
+
+export interface ModuleBank {
+  slug: string;
+  passScore: number;
+  questions: Question[];
+  note?: string;
+}
+
+export interface GradeResult {
+  score: number;
+  total: number;
+  passScore: number;
+  passed: boolean;
+}
+
 export interface CohortRow {
   id: string;
   email: string;
@@ -100,6 +120,12 @@ export const api = {
   challenge: (slug: string) =>
     request<{ nonce: string; expiresAt: string; command: string }>(
       `/api/v1/steps/${slug}/challenge`, { method: "POST" }),
+  module: (slug: string) => request<ModuleBank>(`/api/v1/modules/${slug}`),
+  attempt: (slug: string, answers: Record<string, number>) =>
+    request<GradeResult>(`/api/v1/modules/${slug}/attempts`, {
+      method: "POST",
+      body: JSON.stringify({ answers }),
+    }),
   cohort: () => request<{ cohort: CohortRow[] }>("/api/v1/operator/cohort"),
   operatorUser: (id: string) => request<OperatorUserDetail>(`/api/v1/operator/users/${id}`),
   override: (id: string, slug: string, state: string, note: string) =>
