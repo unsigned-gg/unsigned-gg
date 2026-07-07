@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# build-site.sh — compose the unsigned.gg GitHub Pages artifact (OPS-393).
+# build-site.sh — compose the unsigned.gg Pages artifact (OPS-393).
 #
 # Two kinds of surface, one published site:
 #   1. Static surfaces (landing index.html, learn/) — copied as-is, NO build
@@ -15,20 +15,15 @@ OUT="${1:?usage: build-site.sh <out-dir>}"
 rm -rf "$OUT"
 mkdir -p "$OUT"
 
-# Static root — everything except repo/tooling surfaces that must not publish.
-rsync -a \
-  --exclude '.git' \
-  --exclude '.github' \
-  --exclude 'apps' \
-  --exclude 'docs' \
-  --exclude 'scripts' \
-  --exclude 'node_modules' \
-  --exclude "$OUT" \
-  --exclude 'CLAUDE.md' \
-  --exclude '.impeccable.md' \
-  --exclude '.design-sync.json' \
-  --exclude '.gitignore' \
-  ./ "$OUT/"
+# Static root — explicit allowlist. Never copy the whole tree: a local
+# `wrangler pages deploy` of the artifact publishes everything in it, so any
+# stray untracked file at repo root would go public (incident 2026-07-07:
+# untracked CSV + dotfiles shipped in a local direct-upload deployment).
+# New static surfaces must be added here deliberately.
+for f in index.html 404.html CNAME; do
+  cp "$f" "$OUT/"
+done
+cp -r learn "$OUT/learn"
 
 # Built apps: apps/<name>/ → /<name>/
 for dir in apps/*/; do
