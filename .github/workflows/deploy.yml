@@ -1,4 +1,10 @@
-name: Deploy to GitHub Pages
+name: Deploy to Cloudflare Pages
+
+# Direct-upload deploy (house pattern, same as cerebral-work): CI composes the
+# site and pushes it to the CF Pages project `unsigned-gg` on the Cerebral
+# account. Custom domains unsigned.gg + www.unsigned.gg (cut over from GitHub
+# Pages 2026-07-07). Requires repo secret CLOUDFLARE_API_TOKEN — the
+# "unsigned-gg-pages-deploy (CI)" token, Pages:Edit scope only.
 
 on:
   push:
@@ -7,8 +13,6 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
   group: pages
@@ -16,18 +20,15 @@ concurrency:
 
 jobs:
   deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
       - name: Compose site (static surfaces + built apps)
         run: bash scripts/build-site.sh _site
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
         with:
-          path: '_site'
-      - id: deployment
-        uses: actions/deploy-pages@v4
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: 07ae57cca8fc1a438f9c9b875d1e2283
+          command: pages deploy _site --project-name unsigned-gg --branch main
