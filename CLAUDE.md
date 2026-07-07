@@ -3,7 +3,7 @@
 ## Charter
 The unsigned **web/brand monorepo** and the **canonical design-system home**
 (OPS-393). All public brand surfaces of unsigned — a GPU-native cloud platform
-for AI/ML inference and training — ship from here via GitHub Pages. The
+for AI/ML inference and training — ship from here via Cloudflare Pages. The
 SSO-backed services (onboard-api, etc.) stay in unsigned-paas.
 
 ## Layout
@@ -20,8 +20,7 @@ SSO-backed services (onboard-api, etc.) stay in unsigned-paas.
   GitHub Pages 2026-07-07)
 - PR gate: `.github/workflows/ci-site.yml` (site composes; required surfaces)
 - Domains: unsigned.gg + www.unsigned.gg (proxied CNAMEs → unsigned-gg.pages.dev).
-  The `CNAME` file is a GitHub-Pages-era rollback affordance — harmless on CF,
-  keep until GH Pages is fully decommissioned.
+  GitHub Pages decommissioned 2026-07-07 (Pages disabled, CNAME removed).
 
 ## Conventions
 - Dark theme with green accent (#00e599)

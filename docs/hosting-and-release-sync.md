@@ -28,7 +28,7 @@ The 2026-06-06 decision kept **GitHub Pages** because the site was a single stat
 All three revisit conditions arrived with the monorepo work (OPS-393/OPS-394): the repo grew a real build pipeline (`apps/` built with bun+vite, composed by `build-site.sh`), per-deploy preview URLs became useful, and the Cerebral house pattern is CF Pages direct upload. Operator decision 2026-07-07: **swap to Cloudflare Pages** (project `unsigned-gg`, direct upload from `.github/workflows/deploy.yml`).
 
 - Domains: `unsigned.gg` + `www.unsigned.gg` as proxied CNAMEs → `unsigned-gg.pages.dev`.
-- Rollback affordance: GitHub Pages is still enabled; re-adding the four GH Pages A records restores it. The `CNAME` file stays in the artifact until GH Pages is decommissioned (tracked in OPS-447).
+- GitHub Pages was decommissioned 2026-07-07 (hard cut, operator decision — no soak): Pages disabled on the repo, `CNAME` file and its CI assert removed. Rollback to GH Pages would now require re-enabling Pages and re-adding the CNAME, not just DNS.
 - **Caution (incident 2026-07-07):** CF Pages keeps *every* deployment publicly reachable on a per-deployment preview URL, and a local `wrangler pages deploy` publishes whatever is in the artifact directory — including untracked files. `build-site.sh` therefore composes from an explicit allowlist; never deploy a hand-assembled directory.
 
 ## Decision 3 — Separate repo *(unchanged)*
@@ -97,5 +97,5 @@ Filed in project **unsigned-paas** (team OPS). See the tickets for acceptance cr
 
 - Wire platform release → `repository_dispatch` from `unsigned-paas` (incl. provisioning the dispatch credential).
 - Consume the release payload on `unsigned-gg` and render current version.
-- CF Pages follow-through: GH Pages decommission after soak (OPS-447).
+- CF Pages follow-through (OPS-447): GH Pages decommissioned 2026-07-07; token hygiene items remain.
 - *(future)* Live platform status endpoint on the site.
