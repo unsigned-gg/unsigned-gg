@@ -15,9 +15,13 @@ SSO-backed services (onboard-api, etc.) stay in unsigned-paas.
   copied as-is + each app's `dist/` at `/<name>/`.
 
 ## Deploy
-- Push to `main` → `.github/workflows/deploy.yml` → GitHub Pages
-- PR gate: `.github/workflows/ci-site.yml` (site composes; CNAME present)
-- Domain: unsigned.gg (`CNAME` — must land in the artifact root)
+- Push to `main` → `.github/workflows/deploy.yml` → **Cloudflare Pages**
+  (direct upload, project `unsigned-gg`, Cerebral account — swapped from
+  GitHub Pages 2026-07-07)
+- PR gate: `.github/workflows/ci-site.yml` (site composes; required surfaces)
+- Domains: unsigned.gg + www.unsigned.gg (proxied CNAMEs → unsigned-gg.pages.dev).
+  The `CNAME` file is a GitHub-Pages-era rollback affordance — harmless on CF,
+  keep until GH Pages is fully decommissioned.
 
 ## Conventions
 - Dark theme with green accent (#00e599)
