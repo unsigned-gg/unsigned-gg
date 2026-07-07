@@ -1,12 +1,14 @@
 {
-  "demo": true,
-  "note": "Seed file. The private-repo snapshot publisher overwrites this with demo:false and a generatedAt timestamp. Coarse health only — by design.",
-  "generatedAt": null,
-  "nodesReady": 3,
-  "nodesTotal": 3,
-  "appsSynced": 24,
-  "appsTotal": 27,
+  "demo": false,
+  "generatedAt": "2026-07-07T04:37:19Z",
+  "nodesReady": 4,
+  "nodesTotal": 4,
+  "appsSynced": 29,
+  "appsTotal": 54,
   "certValid": true,
-  "k8s": "v1.3x",
-  "pools": { "cpu": 3, "gpu": 0 }
+  "k8s": "v1.34.5",
+  "pools": {
+    "cpu": 4,
+    "gpu": 0
+  }
 }
