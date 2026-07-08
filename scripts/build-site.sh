@@ -22,6 +22,8 @@ for f in index.html 404.html; do
   cp "$f" "$OUT/"
 done
 cp -r learn "$OUT/learn"
+# Shared brand tokens at the site root (packages/tokens is the source of truth).
+cp packages/tokens/dist/tokens.css "$OUT/tokens.css"
 
 # Built apps: apps/<name>/ → /<name>/
 for dir in apps/*/; do

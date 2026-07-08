@@ -2,28 +2,11 @@
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* Brand tokens come from /tokens.css (@unsigned-gg/tokens — the canonical
+   source; index.html links it before this file). Only /learn-local layout
+   vars live here. */
 :root {
-  --bg: #0a0a0a;
-  --surface: #111111;
-  --surface-2: #161616;
-  --surface-3: #1c1c1c;
-  --border: rgba(255,255,255,0.06);
-  --border-hover: rgba(255,255,255,0.14);
-  --dim: rgba(255,255,255,0.42);      /* decorative / large text only */
-  --mid: rgba(255,255,255,0.62);      /* AA on bg for body text */
-  --bright: rgba(255,255,255,0.87);
-  --white: #eaeaea;
-  --green: #00e599;
-  --green-dim: rgba(0,229,153,0.12);
-  --green-glow: rgba(0,229,153,0.06);
-  --blue: #4d9fff;
-  --purple: #a78bfa;
-  --orange: #f59e0b;
-  --red: #ef4444;
-  --mono: 'JetBrains Mono', ui-monospace, monospace;
-  --sans: 'Inter', -apple-system, sans-serif;
   --rail-w: 248px;
-  --ease: cubic-bezier(0.16, 1, 0.3, 1); /* ease-out-expo-ish */
 }
 
 html { scroll-behavior: smooth; }

@@ -1,0 +1,22 @@
+{
+  "name": "@unsigned-gg/tokens",
+  "version": "0.1.0",
+  "description": "unsigned brand design tokens — dark instrument panel (#0a0a0a + #00e599). Canonical source: unsigned-gg/unsigned-gg packages/tokens.",
+  "license": "MIT",
+  "type": "module",
+  "main": "dist/tokens.js",
+  "exports": {
+    ".": "./dist/tokens.js",
+    "./tokens.css": "./dist/tokens.css",
+    "./tokens.json": "./tokens.json"
+  },
+  "files": ["dist", "tokens.json", "README.md"],
+  "scripts": {
+    "build": "node build.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/unsigned-gg/unsigned-gg.git",
+    "directory": "packages/tokens"
+  }
+}
