@@ -3,3 +3,7 @@
 *~
 _site/
 .wrangler/
+# The operator's global gitignore excludes dist/ — these generated token
+# artifacts are deliberately checked in (no-build consumers + CI mismatch gate).
+!packages/tokens/dist/
+!packages/tokens/dist/**
