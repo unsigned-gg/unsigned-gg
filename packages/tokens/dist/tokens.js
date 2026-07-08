@@ -1,0 +1,24 @@
+/* @unsigned-gg/tokens — GENERATED from tokens.json, do not edit. */
+export const tokens = {
+  "bg": "#0a0a0a",
+  "surface": "#111111",
+  "surface-2": "#161616",
+  "surface-3": "#1c1c1c",
+  "border": "rgba(255,255,255,0.06)",
+  "border-hover": "rgba(255,255,255,0.14)",
+  "dim": "rgba(255,255,255,0.42)",
+  "mid": "rgba(255,255,255,0.62)",
+  "bright": "rgba(255,255,255,0.87)",
+  "white": "#eaeaea",
+  "green": "#00e599",
+  "green-dim": "rgba(0,229,153,0.12)",
+  "green-glow": "rgba(0,229,153,0.06)",
+  "blue": "#4d9fff",
+  "purple": "#a78bfa",
+  "orange": "#f59e0b",
+  "red": "#ef4444",
+  "mono": "'JetBrains Mono', ui-monospace, monospace",
+  "sans": "'Inter', -apple-system, sans-serif",
+  "ease": "cubic-bezier(0.16, 1, 0.3, 1)"
+};
+export default tokens;
