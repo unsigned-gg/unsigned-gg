@@ -14,6 +14,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
+      - name: Tokens dist matches source
+        run: |
+          (cd packages/tokens && bun run build)
+          git diff --exit-code packages/tokens/dist
       - name: Compose site
         run: bash scripts/build-site.sh _site
       - name: Assert required surfaces
@@ -22,3 +26,4 @@ jobs:
           test -f _site/learn/index.html
           test -f _site/onboard/index.html
           test -f _site/404.html
+          test -f _site/tokens.css
