@@ -1,9 +1,9 @@
 {
   "demo": false,
-  "generatedAt": "2026-07-08T22:31:07Z",
+  "generatedAt": "2026-07-09T04:27:59Z",
   "nodesReady": 4,
   "nodesTotal": 4,
-  "appsSynced": 39,
+  "appsSynced": 59,
   "appsTotal": 59,
   "certValid": true,
   "k8s": "v1.34.5",
