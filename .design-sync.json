@@ -1,9 +1,10 @@
 {
   "project": "unsigned",
   "projectId": "5e741fa4-8369-467e-9b2f-f1c718e51feb",
-  "note": "One-way mirror repo -> claude.ai design project. The 'unsigned' project is also fed by unsigned-paas applications/cluster-control-panel/.design-sync.json (tokens.css) - two sources, one project. Run /design-sync after merging changes to these files.",
+  "note": "One-way mirror repo -> claude.ai design project. tokens.css feeds from packages/tokens/dist (the canon; OPS-496) - the old hand-maintained feed from unsigned-paas cluster-control-panel should drop its tokens.css entry. Run /design-sync after merging changes to these files.",
   "files": [
     { "src": ".impeccable.md", "dest": "design-context.md" },
-    { "src": "index.html", "dest": "brand-landing.html" }
+    { "src": "index.html", "dest": "brand-landing.html" },
+    { "src": "packages/tokens/dist/tokens.css", "dest": "tokens.css" }
   ]
 }

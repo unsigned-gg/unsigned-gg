@@ -1,18 +1,21 @@
 @import "tailwindcss";
+@import "@unsigned-gg/tokens/tokens.css";
 
-@theme {
-  --color-bg: #0a0a0a;
-  --color-surface: #111111;
-  --color-surface-2: #161616;
-  --color-line: rgba(255, 255, 255, 0.06);
-  --color-dim: rgba(255, 255, 255, 0.42);
-  --color-mid: rgba(255, 255, 255, 0.62);
-  --color-bright: #eaeaea;
-  --color-signal: #00e599;
-  --color-warn: #f59e0b;
-  --color-bad: #ef4444;
-  --color-target: #a78bfa;
-  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+/* Brand tokens come from @unsigned-gg/tokens (packages/tokens — the canonical
+   source). @theme inline maps them onto this app's Tailwind namespace. */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--border);
+  --color-dim: var(--dim);
+  --color-mid: var(--mid);
+  --color-bright: var(--white);
+  --color-signal: var(--green);
+  --color-warn: var(--orange);
+  --color-bad: var(--red);
+  --color-target: var(--purple);
+  --font-mono: var(--mono);
 }
 
 body {

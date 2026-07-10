@@ -1,0 +1,8 @@
+{
+  "name": "unsigned-gg",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ]
+}

@@ -7,31 +7,13 @@
   <meta name="description" content="unsigned is a GPU-native cloud platform for AI/ML inference and training. Scale to zero. Scale to thousands. No vendor lock-in." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/tokens.css" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    /* ── unsigned brand tokens — SOURCE OF TRUTH ─────────────────────────
-       Mirrored into unsigned-paas cluster-control-panel (OPS-161) and the
-       claude.ai "unsigned" design project. Change values here → propagate. */
+    /* Brand tokens come from /tokens.css (@unsigned-gg/tokens — canonical
+       source: packages/tokens). Only per-surface layout vars live here. */
     :root {
-      --bg: #0a0a0a;
-      --surface: #111111;
-      --surface-2: #161616;
-      --border: rgba(255,255,255,0.06);
-      --border-hover: rgba(255,255,255,0.12);
-      --dim: rgba(255,255,255,0.35);
-      --mid: rgba(255,255,255,0.6);
-      --bright: rgba(255,255,255,0.85);
-      --white: #eaeaea;
-      --green: #00e599;
-      --green-dim: rgba(0,229,153,0.12);
-      --green-glow: rgba(0,229,153,0.06);
-      --blue: #4d9fff;
-      --purple: #a78bfa;
-      --orange: #f59e0b;
-      --red: #ef4444;
-      --mono: 'JetBrains Mono', monospace;
-      --sans: 'Inter', -apple-system, sans-serif;
       --gutter: clamp(24px, 5vw, 64px);
       --measure: 1200px;
     }
