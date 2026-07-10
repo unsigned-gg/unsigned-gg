@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "@unsigned-gg/tokens source",
+  "description": "unsigned brand token source. Groups of flat name->string values; $-prefixed keys are metadata. The `role` group aliases other token NAMES (legacy bare groups only) and emits var() references.",
+  "type": "object",
+  "required": ["color", "font"],
+  "patternProperties": {
+    "^\\$": {},
+    "^[a-z][a-z-]*$": {
+      "type": "object",
+      "patternProperties": {
+        "^\\$": {},
+        "^[a-z0-9][a-z0-9-]*$": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
