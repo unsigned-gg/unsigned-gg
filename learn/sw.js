@@ -1,8 +1,8 @@
 /* unsigned/learn service worker — offline shell, network-first data. */
 'use strict';
 
-const CACHE = 'u-learn-v1';
-const SHELL = ['./', 'index.html', 'styles.css', 'app.js', 'manifest.webmanifest', 'icon.svg'];
+const CACHE = 'u-learn-v2';
+const SHELL = ['./', 'index.html', 'styles.css', 'app.js', 'manifest.webmanifest', 'icon.svg', '/palette.js', '/tokens.css'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
