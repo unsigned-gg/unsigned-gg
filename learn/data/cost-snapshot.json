@@ -1,0 +1,12 @@
+{
+  "generatedAt": "2026-07-11",
+  "currency": "USD",
+  "totalMonthly": 685,
+  "boxes": 5,
+  "classes": {
+    "compute": 595,
+    "gpu": 0,
+    "network": 10,
+    "storage": 80
+  }
+}
