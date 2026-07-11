@@ -2,7 +2,7 @@
   "meta": {
     "generatedAt": "2026-07-11",
     "demo": false,
-    "note": "Curated, sanitized snapshot of the unsigned platform engineering roadmap. Edit this file to evolve the public roadmap; the page renders from it. No internal identifiers, hostnames, or credentials — public-site data honesty applies."
+    "note": "Curated, sanitized projection of the internal platform roadmap (the canonical order+status doc) reconciled against milestone progress. Edit this file to evolve the public roadmap; the page renders from it. Public-site data honesty: no internal identifiers, hostnames, IPs, usernames, credentials, or codenames, and status reflects real progress — nothing marked shipped that isn't."
   },
   "horizons": [
     {
@@ -10,6 +10,24 @@
       "label": "Now",
       "hint": "in flight",
       "items": [
+        {
+          "area": "Substrate",
+          "title": "Move onto self-run baremetal",
+          "blurb": "The work that organizes the quarter: migrating the platform off managed Kubernetes onto self-run Talos baremetal. Denser, cheaper capacity under our own control — measured by how fast it closes the dual-cluster window.",
+          "status": "building"
+        },
+        {
+          "area": "Platform",
+          "title": "Isolated microVM dev environments",
+          "blurb": "Per-engineer Firecracker microVMs with kernel-level isolation — live for the team today. A real machine each, not a shared namespace.",
+          "status": "shipped"
+        },
+        {
+          "area": "Identity",
+          "title": "Single sign-on across the platform",
+          "blurb": "Keycloak OIDC with Google Workspace brokering — one login for the registry, dashboards, GitOps, and internal tools, with group-based access. Live.",
+          "status": "shipped"
+        },
         {
           "area": "Delivery",
           "title": "Self-hosted CI/CD with enforced review",
@@ -19,20 +37,14 @@
         {
           "area": "Security",
           "title": "One keyless secret store",
-          "blurb": "Every credential consolidates onto OpenBao behind OIDC-brokered auth. The goal is blunt: no secret ever copied by hand, no long-lived tokens sitting on disk.",
+          "blurb": "Every credential consolidates onto OpenBao behind OIDC-brokered auth — most of the way there. The goal is blunt: no secret ever copied by hand, no long-lived tokens sitting on disk.",
           "status": "building"
         },
         {
-          "area": "Identity",
-          "title": "Single sign-on across the platform",
-          "blurb": "Keycloak OIDC with Google Workspace brokering — one login for the registry, dashboards, GitOps, and internal tools, with group-based access.",
-          "status": "shipped"
-        },
-        {
           "area": "Operations",
-          "title": "Observability baseline",
-          "blurb": "Prometheus, Grafana, Loki and tracing wired across the cluster; service health is visible end to end rather than inferred.",
-          "status": "shipped"
+          "title": "Observability core",
+          "blurb": "Prometheus, Grafana, Loki and tracing live across the cluster; service health is watched, not inferred. Extending the same coverage onto the baremetal substrate is the remaining piece.",
+          "status": "building"
         }
       ]
     },
@@ -42,10 +54,10 @@
       "hint": "committed",
       "items": [
         {
-          "area": "Compute",
-          "title": "GPU inference serving",
-          "blurb": "Triton-based model serving with scale-to-zero and fractional-GPU scheduling, so idle models cost nothing and hot ones burst.",
-          "status": "planned"
+          "area": "Platform",
+          "title": "Self-serve engineer onboarding",
+          "blurb": "One flow from zero to operating the platform: access, identity, and a working environment, without a human in the loop for each step. Code-complete; enabling it broadly is next.",
+          "status": "building"
         },
         {
           "area": "Delivery",
@@ -54,9 +66,9 @@
           "status": "building"
         },
         {
-          "area": "Platform",
-          "title": "Self-serve engineer onboarding",
-          "blurb": "One flow from zero to operating the platform: access, identity, and a working kubeconfig, without a human in the loop for each step.",
+          "area": "Compute",
+          "title": "Dedicated GPU capacity",
+          "blurb": "Bridge a rented-GPU spike to dedicated, colocated GPU for inference and training at scale — capacity we own rather than rent by the hour.",
           "status": "planned"
         }
       ]
@@ -64,18 +76,18 @@
     {
       "id": "later",
       "label": "Later",
-      "hint": "directional",
+      "hint": "toward general availability",
       "items": [
         {
           "area": "Compute",
-          "title": "Baremetal capacity",
-          "blurb": "Extend beyond managed Kubernetes onto self-run baremetal for denser, cheaper GPU — managed and baremetal under one control plane.",
+          "title": "GPU inference & training serving",
+          "blurb": "Model serving with scale-to-zero and fractional-GPU scheduling on the dedicated fleet — idle models cost nothing, hot ones burst.",
           "status": "planned"
         },
         {
           "area": "Security",
-          "title": "Sandboxed multi-tenant compute",
-          "blurb": "Kernel-isolated workloads and per-tenant namespaces so shared execution is safe by construction, not by trust.",
+          "title": "Multi-tenant isolation, proven",
+          "blurb": "Per-tenant namespaces and sandboxed execution proven out for safe shared use. A hard gate before anything general-availability builds on the platform.",
           "status": "planned"
         },
         {
