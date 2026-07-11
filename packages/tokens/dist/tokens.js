@@ -39,11 +39,31 @@ export const tokens = {
     "body-s": "13px",
     "body": "14px",
     "lede": "15px",
+    "prose": "16px",
     "h3": "18px",
     "h2": "22px",
     "h1": "28px",
+    "display-s": "clamp(26px, 3.4vw, 38px)",
+    "display-m": "clamp(28px, 3.6vw, 44px)",
+    "display-l": "clamp(30px, 4.4vw, 52px)",
+    "display-xl": "clamp(40px, 5.4vw, 72px)",
+    "line-display": "1.1",
     "line-tight": "1.3",
-    "line": "1.6"
+    "line": "1.6",
+    "line-loose": "1.75",
+    "line-airy": "2"
+  },
+  "weight": {
+    "light": "300",
+    "regular": "400",
+    "medium": "500",
+    "semibold": "600"
+  },
+  "track": {
+    "tight": "-0.02em",
+    "open": "0.04em",
+    "caps": "0.08em",
+    "wide": "0.15em"
   },
   "space": {
     "0": "0",
