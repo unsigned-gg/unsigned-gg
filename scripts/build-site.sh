@@ -31,6 +31,7 @@ cp packages/palette/dist/palette.js "$OUT/palette.js"
 # Brand mark + crawler/disclosure plumbing — explicit files, never a directory.
 cp assets/favicon.svg "$OUT/favicon.svg"
 cp assets/unsigned-logo.svg "$OUT/unsigned-logo.svg"
+cp assets/og-card.png "$OUT/og-card.png"
 cp robots.txt "$OUT/robots.txt"
 mkdir -p "$OUT/.well-known"
 cp .well-known/security.txt "$OUT/.well-known/security.txt"
