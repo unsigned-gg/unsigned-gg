@@ -33,5 +33,23 @@
 </head>
 <body>
   <p>404 — nothing at this path. <a href="/">unsigned.gg</a></p>
+  <script src="/palette.js"></script>
+  <script>
+    // ⌘K on every page — even this one (canon).
+    window.UnsignedPalette.init({
+      getItems: function (q) {
+        var items = [
+          { hex: '0x00', label: 'unsigned.gg — home', k2: '', run: function () { location.href = '/'; } },
+          { hex: '0x06', label: 'Learn — interactive explainers', k2: '', run: function () { location.href = '/learn/'; } },
+          { hex: 'cmd', label: '/onboard — internal · sso', k2: '', run: function () { location.href = '/onboard/'; } },
+        ];
+        var needle = q.trim().toLowerCase();
+        return needle ? items.filter(function (a) {
+          return (a.hex + ' ' + a.label).toLowerCase().indexOf(needle) !== -1;
+        }) : items;
+      },
+      emptyText: 'still nothing at that address.',
+    });
+  </script>
 </body>
 </html>

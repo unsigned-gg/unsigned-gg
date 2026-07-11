@@ -1,0 +1,20 @@
+{
+  "name": "@unsigned-gg/palette",
+  "version": "0.1.0",
+  "private": true,
+  "description": "unsigned \u2318K command bar \u2014 one shared engine, per-surface item lists",
+  "type": "module",
+  "main": "dist/palette.mjs",
+  "module": "dist/palette.mjs",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "default": "./dist/palette.mjs"
+    },
+    "./palette.js": "./dist/palette.js"
+  },
+  "scripts": {
+    "build": "node build.mjs"
+  },
+  "types": "./index.d.ts"
+}

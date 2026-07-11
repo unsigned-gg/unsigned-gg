@@ -24,6 +24,8 @@ done
 cp -r learn "$OUT/learn"
 # Shared brand tokens at the site root (packages/tokens is the source of truth).
 cp packages/tokens/dist/tokens.css "$OUT/tokens.css"
+# Shared command-bar engine (packages/palette), same discipline.
+cp packages/palette/dist/palette.js "$OUT/palette.js"
 
 # Brand mark + crawler/disclosure plumbing — explicit files, never a directory.
 cp assets/favicon.svg "$OUT/favicon.svg"

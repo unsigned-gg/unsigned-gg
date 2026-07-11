@@ -100,6 +100,12 @@
     }
     .nav-link:hover { color: var(--green); }
     .nav-link .idx { color: var(--green); opacity: 0.7; margin-right: 4px; }
+    .kbd-chip {
+      font-family: var(--mono); font-size: var(--text-label); color: var(--dim);
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm);
+      padding: 3px 8px; cursor: pointer;
+    }
+    .kbd-chip:hover { color: var(--green); border-color: var(--border-hover); }
     .nav-status {
       display: flex;
       align-items: center;
@@ -529,6 +535,7 @@
         <a href="#pricing" class="nav-link"><span class="idx">0x04</span>Costs</a>
         <a href="#access" class="nav-link hide-sm"><span class="idx">0x05</span>Access</a>
         <a href="learn/" class="nav-link"><span class="idx">0x06</span>Learn</a>
+        <button class="kbd-chip" type="button" aria-label="open command bar">⌘K</button>
         <div class="nav-status">
           <div class="status-dot"></div>
           Building
@@ -790,6 +797,7 @@
       <div class="footer-links">
         <a href="mailto:chris@todie.io">Contact</a>
         <a href="https://github.com/unsigned-gg">GitHub</a>
+        <a href="onboard/">/onboard — internal · sso</a>
       </div>
     </div>
   </footer>
@@ -806,6 +814,41 @@
       }, { threshold: 0.1 });
       reveals.forEach(r => observer.observe(r));
     }
+  </script>
+  <script src="/palette.js"></script>
+  <script>
+    // ⌘K command bar (canon: primary navigation on every page). Engine is the
+    // shared /palette.js; this list is the landing's own.
+    (function () {
+      var sections = [
+        ['0x01', 'Capabilities', '#capabilities'],
+        ['0x02', 'Stack', '#stack'],
+        ['0x03', 'Architecture', '#arch'],
+        ['0x04', 'Costs', '#pricing'],
+        ['0x05', 'Access', '#access'],
+      ];
+      var bar = window.UnsignedPalette.init({
+        getItems: function (q) {
+          var items = sections.map(function (s) {
+            return { hex: s[0], label: s[1], k2: '', run: function () { location.hash = s[2]; } };
+          }).concat([
+            { hex: '0x06', label: 'Learn — interactive explainers', k2: '', run: function () { location.href = 'learn/'; } },
+            { hex: 'cmd', label: '/onboard — internal · sso', k2: '', run: function () { location.href = 'onboard/'; } },
+            { hex: 'cmd', label: 'contact — chris@todie.io', k2: '', run: function () { location.href = 'mailto:chris@todie.io'; } },
+          ]);
+          var needle = q.trim().toLowerCase();
+          var out = needle ? items.filter(function (a) {
+            return (a.hex + ' ' + a.label).toLowerCase().indexOf(needle) !== -1;
+          }) : items;
+          if (/^(0x)?f{2,8}$/.test(needle)) {
+            out.push({ hex: '0xff', label: 'overflow — wrap around', k2: '', run: function () { scrollTo({ top: 0 }); } });
+          }
+          return out;
+        },
+        emptyText: 'nothing at that address.',
+      });
+      document.querySelector('.kbd-chip').addEventListener('click', bar.open);
+    })();
   </script>
 </body>
 </html>

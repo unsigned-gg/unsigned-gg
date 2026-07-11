@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, Route, Routes, useNavigate } from "react-router-dom";
+import UnsignedPalette from "@unsigned-gg/palette";
 import { appPath } from "./base";
 import { userManager } from "./auth/oidc";
 import { api, type Me } from "./api/client";
@@ -31,9 +32,35 @@ function Splash({ msg }: { msg: string }) {
   );
 }
 
+// ⌘K command bar (canon: primary navigation on every page). Shared engine
+// from @unsigned-gg/palette; this list is the app's own. Mounted once per
+// App lifetime, torn down on unmount.
+function usePalette() {
+  const navigate = useNavigate();
+  useEffect(() => {
+    const bar = UnsignedPalette.init({
+      getItems: (q: string) => {
+        const items = [
+          { hex: "0x00", label: "track — onboarding home", k2: "", run: () => navigate("/") },
+          { hex: "0x01", label: "guides", k2: "", run: () => navigate("/guides") },
+          { hex: "0x02", label: "settings", k2: "", run: () => navigate("/settings") },
+          { hex: "cmd", label: "back to unsigned.gg", k2: "", run: () => { location.href = "/"; } },
+        ];
+        const needle = q.trim().toLowerCase();
+        return needle
+          ? items.filter((a) => `${a.hex} ${a.label}`.toLowerCase().includes(needle))
+          : items;
+      },
+      emptyText: "nothing at that address.",
+    });
+    return () => bar.destroy();
+  }, [navigate]);
+}
+
 export default function App() {
   const [me, setMe] = useState<Me | null>(null);
   const [booting, setBooting] = useState(true);
+  usePalette();
 
   useEffect(() => {
     if (appPath() === "/callback") {
