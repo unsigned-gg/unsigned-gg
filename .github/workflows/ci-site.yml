@@ -18,6 +18,10 @@ jobs:
         run: |
           (cd packages/tokens && bun run build)
           git diff --exit-code packages/tokens/dist
+      - name: Palette dist matches source
+        run: |
+          (cd packages/palette && bun run build)
+          git diff --exit-code packages/palette/dist
       - name: Compose site
         run: bash scripts/build-site.sh _site
       - name: Assert required surfaces
@@ -27,6 +31,7 @@ jobs:
           test -f _site/onboard/index.html
           test -f _site/404.html
           test -f _site/tokens.css
+          test -f _site/palette.js
           test -f _site/favicon.svg
           test -f _site/unsigned-logo.svg
           test -f _site/robots.txt

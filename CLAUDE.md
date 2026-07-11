@@ -27,7 +27,9 @@ SSO-backed services (onboard-api, etc.) stay in unsigned-paas.
 - Fonts: Inter (sans), JetBrains Mono (mono)
 - CSS custom properties for theming
 - Landing + /learn stay single-file/no-build; build complexity is confined
-  to `apps/`
+  to `apps/`. Site-root shared assets built from `packages/` (`/tokens.css`,
+  `/palette.js`) are the one sanctioned sharing mechanism for the static
+  surfaces — each added to `build-site.sh`'s allowlist deliberately.
 
 ## Design Context (canon: .impeccable.md)
 This repo is the canonical home of the unsigned brand/design system — see
