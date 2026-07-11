@@ -798,7 +798,7 @@
     <div class="footer-inner">
       <div>
         <div class="footer-logo">unsigned<span>.</span>gg</div>
-        <div class="footer-copy">&copy; 2026 unsigned.gg &middot; all rights reserved &middot; big ideas, little endian</div>
+        <div class="footer-copy">&copy; 2026 unsigned.gg &middot; all rights reserved &middot; big ideas, little endian<span id="release-stamp"></span></div>
       </div>
       <div class="footer-links">
         <a href="mailto:chris@todie.io">Contact</a>
@@ -861,19 +861,47 @@
     // snapshot when it is fresh (<24h) and not demo data. Same staleness
     // discipline as /learn's cluster monitor.
     (function () {
-      fetch('/learn/data/cluster-snapshot.json', { cache: 'no-store' })
-        .then(function (r) { return r.ok ? r.json() : null; })
-        .then(function (d) {
-          if (!d || d.demo === true) return;
-          var fresh = d.generatedAt && (Date.now() - Date.parse(d.generatedAt)) < 24 * 3600e3;
-          if (!fresh) return;
-          document.getElementById('ledger-live').textContent =
+      var grab = function (path) {
+        return fetch(path, { cache: 'no-store' })
+          .then(function (r) { return r.ok ? r.json() : null; })
+          .catch(function () { return null; });
+      };
+      // Cluster facts and dollars are applied together, cluster first —
+      // parallel .then handlers raced (the cluster assignment wiped an
+      // earlier-arriving dollar append). Dollars come from the
+      // hand-maintained paas cost ledger (OPS-579); its generatedAt is the
+      // hand-tally date. Absent or zero → no dollar claim (honest default).
+      Promise.all([
+        grab('/learn/data/cluster-snapshot.json'),
+        grab('/learn/data/cost-snapshot.json'),
+      ]).then(function (res) {
+        var d = res[0], c = res[1];
+        var live = document.getElementById('ledger-live');
+        if (d && d.demo !== true && d.generatedAt &&
+            (Date.now() - Date.parse(d.generatedAt)) < 24 * 3600e3) {
+          live.textContent =
             d.nodesTotal + ' boxes · cpu pool ' + d.pools.cpu + ' · gpu pool ' + d.pools.gpu +
             ' · k8s ' + d.k8s + ' · ' + d.appsSynced + '/' + d.appsTotal + ' apps synced';
           document.getElementById('ledger-label').textContent =
             'Fleet ledger — snapshot ' + d.generatedAt.slice(0, 10) + ' · live';
+        }
+        if (c && c.totalMonthly > 0 && c.generatedAt) {
+          live.textContent +=
+            ' · $' + Number(c.totalMonthly).toLocaleString('en-US') +
+            '/mo (hand-tallied ' + String(c.generatedAt).slice(0, 10) + ')';
+        }
+      });
+
+      // Platform release stamp (OPS-578) — written by the paas
+      // site-release-sync workflow. Absent until the first synced release.
+      fetch('/learn/data/release.json', { cache: 'no-store' })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (rel) {
+          if (!rel || !rel.version) return;
+          document.getElementById('release-stamp').textContent =
+            ' · platform ' + rel.version + (rel.date ? ' · ' + String(rel.date).slice(0, 10) : '');
         })
-        .catch(function () { /* offline — the labeled fallback stands */ });
+        .catch(function () {});
     })();
   </script>
 </body>
