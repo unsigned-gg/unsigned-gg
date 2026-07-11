@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>unsigned/roadmap</title>
+  <meta name="description" content="What the unsigned platform is building — now, next, and later. A dataroom, not a funnel: real engineering, sanitized for the public site." />
+  <meta name="theme-color" content="#0a0a0a" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%230a0a0a'/><text x='16' y='22' font-family='monospace' font-size='16' fill='%2300e599' text-anchor='middle'>0x</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/tokens.css" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <a href="#main" class="skip">skip to content</a>
+
+  <header class="top">
+    <div class="logo"><a href="../">unsigned<b>.gg</b></a><span>/roadmap</span></div>
+    <div class="top-right">
+      <span class="stamp" aria-live="polite"><span class="led"></span><span class="txt" data-stamp>loading</span></span>
+      <button class="kbd-hint" aria-label="open command bar"><kbd>⌘</kbd><kbd>K</kbd> jump</button>
+    </div>
+  </header>
+
+  <main id="main" tabindex="-1">
+    <section class="intro">
+      <p class="eyebrow">unsigned platform · engineering roadmap</p>
+      <h1>What we're building.</h1>
+      <p class="lede">unsigned is a GPU-native platform for AI/ML inference and training — the mothership
+        the rest of the estate runs on. This is the real work, in flight and ahead. No dates we can't keep;
+        horizons we can.</p>
+    </section>
+
+    <section class="board" aria-label="roadmap horizons"></section>
+
+    <footer class="foot">
+      <span data-foot-stamp></span>
+      <span class="bit">// no sign bit — everything here is unsigned</span>
+    </footer>
+  </main>
+
+  <div class="palette-wrap" role="dialog" aria-modal="true" aria-label="command bar" hidden>
+    <div class="scrim"></div>
+    <div class="palette">
+      <input type="text" placeholder="jump to a horizon or an item…" aria-label="command bar input"
+             role="combobox" aria-expanded="true" aria-controls="cmd-list" spellcheck="false" autocomplete="off" />
+      <ul id="cmd-list" role="listbox"></ul>
+    </div>
+  </div>
+
+  <noscript>
+    <div class="nojs">
+      <h1>unsigned/roadmap needs JavaScript</h1>
+      <p>The roadmap renders from a small data file. Its source lives at
+      <code>roadmap/data/roadmap.json</code> in this repository.</p>
+    </div>
+  </noscript>
+
+  <script src="app.js"></script>
+</body>
+</html>

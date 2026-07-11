@@ -32,6 +32,8 @@ jobs:
         run: |
           test -f _site/index.html
           test -f _site/learn/index.html
+          test -f _site/roadmap/index.html
+          test -f _site/roadmap/data/roadmap.json
           test -f _site/onboard/index.html
           test -f _site/404.html
           test -f _site/tokens.css
