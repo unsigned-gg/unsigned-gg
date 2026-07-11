@@ -755,8 +755,14 @@
           </ul>
         </div>
         <div class="pricing-note">
-          <div class="pricing-note-label">Fleet ledger — snapshot 2026-07-10</div>
-          <p>The whole operation, all-in: <strong style="color:var(--white)">12 boxes · $3,240/mo · 0 strays</strong>. Published because we have nothing to sell you — transparency is cheaper than marketing.</p>
+          <!-- Fallback values below are hand-verified against
+               learn/data/cluster-snapshot.json (2026-07-11); the inline fetch
+               at the end of the page upgrades them to the live CI snapshot
+               when it is fresh (canon: data honesty — labeled, never silently
+               stale). Dollar figure returns when the cost-snapshot contract
+               ships (roadmap P4). -->
+          <div class="pricing-note-label" id="ledger-label">Fleet ledger — last verified 2026-07-11</div>
+          <p>The whole operation: <strong id="ledger-live" style="color:var(--white)">4 boxes · cpu pool 4 · gpu pool 0 · k8s v1.34.5</strong>. Published because we have nothing to sell you — transparency is cheaper than marketing.</p>
           <p class="skus">
             A100 80GB · MIG 3g.40gb + full<br>
             H100 80GB · MIG + full<br>
@@ -848,6 +854,26 @@
         emptyText: 'nothing at that address.',
       });
       document.querySelector('.kbd-chip').addEventListener('click', bar.open);
+    })();
+  </script>
+  <script>
+    // Fleet ledger — upgrade the hand-verified fallback to the live CI
+    // snapshot when it is fresh (<24h) and not demo data. Same staleness
+    // discipline as /learn's cluster monitor.
+    (function () {
+      fetch('/learn/data/cluster-snapshot.json', { cache: 'no-store' })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (d) {
+          if (!d || d.demo === true) return;
+          var fresh = d.generatedAt && (Date.now() - Date.parse(d.generatedAt)) < 24 * 3600e3;
+          if (!fresh) return;
+          document.getElementById('ledger-live').textContent =
+            d.nodesTotal + ' boxes · cpu pool ' + d.pools.cpu + ' · gpu pool ' + d.pools.gpu +
+            ' · k8s ' + d.k8s + ' · ' + d.appsSynced + '/' + d.appsTotal + ' apps synced';
+          document.getElementById('ledger-label').textContent =
+            'Fleet ledger — snapshot ' + d.generatedAt.slice(0, 10) + ' · live';
+        })
+        .catch(function () { /* offline — the labeled fallback stands */ });
     })();
   </script>
 </body>
