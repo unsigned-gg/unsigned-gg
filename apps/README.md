@@ -8,7 +8,7 @@ Rules:
   never absorb them.
 - An app's vite config must set `base: "/<name>/"` so assets resolve under its
   path on the shared origin.
-- Client-side routing on GitHub Pages needs the root `404.html` redirect
+- Client-side routing on Cloudflare Pages needs the root `404.html` redirect
   pattern (no server rewrites): unknown paths under `/<name>/` bounce to
   `/<name>/?p=<path>` and the app restores the URL before mounting its
   router (see `onboard/src/main.tsx`).

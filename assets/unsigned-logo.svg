@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- unsigned mark — ink ground, signal green, no gradient (canon: .impeccable.md) -->
+  <rect x="32" y="32" width="448" height="448" rx="80" ry="80" fill="#0a0a0a" />
+
+  <!-- Outer ring -->
+  <circle cx="256" cy="256" r="160" fill="none" stroke="#00e599" stroke-width="16" opacity="0.9" />
+
+  <!-- Crosshair lines — pass through the zero hub -->
+  <line x1="256" y1="96" x2="256" y2="214" stroke="#00e599" stroke-width="12" stroke-linecap="square" opacity="0.9" />
+  <line x1="256" y1="298" x2="256" y2="416" stroke="#00e599" stroke-width="12" stroke-linecap="square" opacity="0.9" />
+  <line x1="96" y1="256" x2="224" y2="256" stroke="#00e599" stroke-width="12" stroke-linecap="square" opacity="0.9" />
+  <line x1="288" y1="256" x2="416" y2="256" stroke="#00e599" stroke-width="12" stroke-linecap="square" opacity="0.9" />
+
+  <!-- Crosshair knobs — square caps at the 4 cardinal points -->
+  <rect x="246" y="78" width="20" height="20" rx="3" fill="#00e599" opacity="0.9" />
+  <rect x="246" y="414" width="20" height="20" rx="3" fill="#00e599" opacity="0.9" />
+  <rect x="78" y="246" width="20" height="20" rx="3" fill="#00e599" opacity="0.9" />
+  <rect x="414" y="246" width="20" height="20" rx="3" fill="#00e599" opacity="0.9" />
+
+  <!-- Hub: zero without slash — the unsigned zero, crosshairs intersect it -->
+  <rect x="224" y="214" width="64" height="84" rx="16" fill="none" stroke="#00e599" stroke-width="10" opacity="1" />
+</svg>

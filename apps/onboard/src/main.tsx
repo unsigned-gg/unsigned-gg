@@ -5,7 +5,7 @@ import App from "./App";
 import { BASE } from "./base";
 import "./index.css";
 
-// GitHub Pages has no server rewrites: deep links under /onboard/ hit the
+// Cloudflare Pages (static compose) has no server rewrites: deep links under /onboard/ hit the
 // root 404.html, which bounces here as /onboard/?p=<path+query>. Restore the
 // real URL before the router (and the OIDC callback handler) read it.
 const restore = new URLSearchParams(window.location.search).get("p");
