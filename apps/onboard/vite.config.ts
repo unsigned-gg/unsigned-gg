@@ -4,7 +4,7 @@ import tailwindcss from "@tailwindcss/vite";
 import { VitePWA } from "vite-plugin-pwa";
 
 export default defineConfig({
-  // Served at unsigned.gg/onboard/ (GitHub Pages compose, OPS-394).
+  // Served at unsigned.gg/onboard/ (Cloudflare Pages compose, OPS-394).
   base: "/onboard/",
   plugins: [
     react(),

@@ -25,6 +25,13 @@ cp -r learn "$OUT/learn"
 # Shared brand tokens at the site root (packages/tokens is the source of truth).
 cp packages/tokens/dist/tokens.css "$OUT/tokens.css"
 
+# Brand mark + crawler/disclosure plumbing — explicit files, never a directory.
+cp assets/favicon.svg "$OUT/favicon.svg"
+cp assets/unsigned-logo.svg "$OUT/unsigned-logo.svg"
+cp robots.txt "$OUT/robots.txt"
+mkdir -p "$OUT/.well-known"
+cp .well-known/security.txt "$OUT/.well-known/security.txt"
+
 # Built apps: apps/<name>/ → /<name>/
 for dir in apps/*/; do
   [ -f "${dir}package.json" ] || continue
