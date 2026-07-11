@@ -866,6 +866,7 @@ function palItems(q) {
     { hex: 'cmd', label: 'reset gate progress', k2: '', run: () => { gate.reset(); location.hash = '#/gate'; render(); } },
     { hex: 'cmd', label: 'help — keyboard shortcuts', k2: '?', run: showHelp },
     { hex: 'cmd', label: 'back to unsigned.gg', k2: '', run: () => { location.href = '../'; } },
+    { hex: 'cmd', label: '/onboard — internal · sso', k2: '', run: () => { location.href = '../onboard/'; } },
   ];
   const needle = q.trim().toLowerCase();
   return needle ? actions.filter(a => (a.hex + ' ' + a.label).toLowerCase().includes(needle)) : actions;

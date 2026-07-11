@@ -9,6 +9,7 @@
       "name": "onboard-frontend",
       "version": "0.4.0",
       "dependencies": {
+        "@unsigned-gg/palette": "workspace:*",
         "@unsigned-gg/tokens": "workspace:*",
         "oidc-client-ts": "^3.1.0",
         "react": "^19.2.0",
@@ -25,6 +26,10 @@
         "vite": "^8.0.0",
         "vite-plugin-pwa": "^1.3.0",
       },
+    },
+    "packages/palette": {
+      "name": "@unsigned-gg/palette",
+      "version": "0.1.0",
     },
     "packages/tokens": {
       "name": "@unsigned-gg/tokens",
@@ -387,6 +392,8 @@
     "@types/resolve": ["@types/resolve@1.20.2", "", {}, "sha512-60BCwRFOZCQhDncwQdxxeOEEkbc5dIMccYLwbxsS4TUNeVECQ/pBJ0j09mrHOl/JJvpRPGwO9SvE4nR2Nb/a4Q=="],
 
     "@types/trusted-types": ["@types/trusted-types@2.0.7", "", {}, "sha512-ScaPdn1dQczgbl0QFTeTOmVHFULt394XJgOQNoyVhZ6r2vLnMLJfBPd53SB52T/3G36VI1/g2MZaX0cwDuXsfw=="],
+
+    "@unsigned-gg/palette": ["@unsigned-gg/palette@workspace:packages/palette"],
 
     "@unsigned-gg/tokens": ["@unsigned-gg/tokens@workspace:packages/tokens"],
 
