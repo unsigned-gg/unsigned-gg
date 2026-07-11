@@ -19,7 +19,11 @@ jobs:
           (cd packages/tokens && bun run build)
           git diff --exit-code packages/tokens/dist
       - name: Palette dist matches source
+        # ls-files first: `git diff` is vacuous for UNTRACKED files, and a
+        # global gitignore `dist/` once kept the palette dist out of the repo
+        # entirely — CI passed while the deploy compose had nothing to copy.
         run: |
+          git ls-files --error-unmatch packages/palette/dist/palette.js packages/palette/dist/palette.mjs
           (cd packages/palette && bun run build)
           git diff --exit-code packages/palette/dist
       - name: Compose site
