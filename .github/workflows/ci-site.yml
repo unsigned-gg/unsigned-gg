@@ -53,3 +53,9 @@ jobs:
             echo '::error::tailnet MagicDNS name found in composed artifact'; exit 1; }
           ! grep -rInE '100\.(6[4-9]|[7-9][0-9]|1[01][0-9]|12[0-7])\.[0-9]+\.[0-9]+' _site | grep -vF '100.64.0.0' || {
             echo '::error::CGNAT address found in composed artifact'; exit 1; }
+      - name: Roadmap data guard — schema + sanitized-projection leak guard
+        # /roadmap is a curated, sanitized projection of the internal platform
+        # roadmap. This guard validates the data schema and fails on internal
+        # identifiers (ticket IDs, codenames, usernames, op://, etc.) beyond the
+        # site-wide *.ts.net/CGNAT check above. See roadmap/check.sh.
+        run: bash roadmap/check.sh roadmap/data/roadmap.json
