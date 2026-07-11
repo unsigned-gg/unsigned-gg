@@ -40,6 +40,7 @@ jobs:
           test -f _site/palette.js
           test -f _site/favicon.svg
           test -f _site/unsigned-logo.svg
+          test -f _site/og-card.png
           test -f _site/robots.txt
           test -f _site/.well-known/security.txt
       - name: Data-honesty gate — no internal identifiers in the artifact

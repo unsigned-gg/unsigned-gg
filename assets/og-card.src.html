@@ -1,0 +1,32 @@
+<!doctype html>
+<html><head>
+<meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { width: 1200px; height: 630px; background: #0a0a0a; overflow: hidden; position: relative; font-family: Inter, sans-serif; }
+  /* 60px engineering grid */
+  body::after { content: ''; position: absolute; inset: 0;
+    background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 60px 60px; }
+  .inner { position: absolute; inset: 0; padding: 72px 84px 64px; display: flex; flex-direction: column; justify-content: space-between; z-index: 1; }
+  .wordmark { font-family: 'JetBrains Mono', monospace; font-size: 30px; font-weight: 500; color: #eaeaea; letter-spacing: -0.02em; }
+  .wordmark span { color: #00e599; }
+  .headline { font-size: 76px; font-weight: 600; line-height: 1.08; letter-spacing: -0.02em; color: #eaeaea; }
+  .strike { position: relative; color: rgba(255,255,255,0.42); white-space: nowrap; }
+  .strike::after { content: ''; position: absolute; left: -2%; right: -2%; top: 54%; height: 5px; background: #00e599; transform: rotate(-1.2deg); }
+  .accent { color: #00e599; }
+  .footline { font-family: 'JetBrains Mono', monospace; font-size: 19px; color: rgba(255,255,255,0.42); letter-spacing: 0.04em; }
+  .footline b { color: rgba(255,255,255,0.62); font-weight: 400; }
+  /* the mark, top right */
+  .mark { position: absolute; top: 66px; right: 84px; width: 132px; height: 132px; }
+</style></head>
+<body>
+  <div class="inner">
+    <div class="wordmark">unsigned<span>.</span>gg</div>
+    <div class="headline">GPU compute,<br><span class="strike">signed</span> <span class="accent">unsigned</span><br>complexity.</div>
+    <div class="footline">idle cost <b>$0</b> &nbsp;·&nbsp; pod-to-pod <b>WireGuard mTLS</b> &nbsp;·&nbsp; exit path <b>fork the stack</b></div>
+  </div>
+  <svg class="mark" viewBox="0 0 512 512"><rect x="32" y="32" width="448" height="448" rx="80" fill="#0a0a0a" stroke="rgba(255,255,255,0.06)" stroke-width="4"/><circle cx="256" cy="256" r="160" fill="none" stroke="#00e599" stroke-width="16" opacity="0.9"/><line x1="256" y1="96" x2="256" y2="214" stroke="#00e599" stroke-width="12" opacity="0.9"/><line x1="256" y1="298" x2="256" y2="416" stroke="#00e599" stroke-width="12" opacity="0.9"/><line x1="96" y1="256" x2="224" y2="256" stroke="#00e599" stroke-width="12" opacity="0.9"/><line x1="288" y1="256" x2="416" y2="256" stroke="#00e599" stroke-width="12" opacity="0.9"/><rect x="246" y="78" width="20" height="20" rx="3" fill="#00e599" opacity="0.9"/><rect x="246" y="414" width="20" height="20" rx="3" fill="#00e599" opacity="0.9"/><rect x="78" y="246" width="20" height="20" rx="3" fill="#00e599" opacity="0.9"/><rect x="414" y="246" width="20" height="20" rx="3" fill="#00e599" opacity="0.9"/><rect x="224" y="214" width="64" height="84" rx="16" fill="none" stroke="#00e599" stroke-width="10"/></svg>
+</body></html>
