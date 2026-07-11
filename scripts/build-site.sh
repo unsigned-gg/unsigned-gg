@@ -22,6 +22,7 @@ for f in index.html 404.html; do
   cp "$f" "$OUT/"
 done
 cp -r learn "$OUT/learn"
+cp -r roadmap "$OUT/roadmap"
 # Shared brand tokens at the site root (packages/tokens is the source of truth).
 cp packages/tokens/dist/tokens.css "$OUT/tokens.css"
 # Shared command-bar engine (packages/palette), same discipline.

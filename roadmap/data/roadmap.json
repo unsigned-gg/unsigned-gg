@@ -1,0 +1,90 @@
+{
+  "meta": {
+    "generatedAt": "2026-07-11",
+    "demo": false,
+    "note": "Curated, sanitized snapshot of the unsigned platform engineering roadmap. Edit this file to evolve the public roadmap; the page renders from it. No internal identifiers, hostnames, or credentials — public-site data honesty applies."
+  },
+  "horizons": [
+    {
+      "id": "now",
+      "label": "Now",
+      "hint": "in flight",
+      "items": [
+        {
+          "area": "Delivery",
+          "title": "Self-hosted CI/CD with enforced review",
+          "blurb": "Code review and merge move onto self-hosted Forgejo: required approvals, signed commits, and CI as real merge-blocking checks. GitHub stays a downstream mirror so releases and issue-linking keep working.",
+          "status": "building"
+        },
+        {
+          "area": "Security",
+          "title": "One keyless secret store",
+          "blurb": "Every credential consolidates onto OpenBao behind OIDC-brokered auth. The goal is blunt: no secret ever copied by hand, no long-lived tokens sitting on disk.",
+          "status": "building"
+        },
+        {
+          "area": "Identity",
+          "title": "Single sign-on across the platform",
+          "blurb": "Keycloak OIDC with Google Workspace brokering — one login for the registry, dashboards, GitOps, and internal tools, with group-based access.",
+          "status": "shipped"
+        },
+        {
+          "area": "Operations",
+          "title": "Observability baseline",
+          "blurb": "Prometheus, Grafana, Loki and tracing wired across the cluster; service health is visible end to end rather than inferred.",
+          "status": "shipped"
+        }
+      ]
+    },
+    {
+      "id": "next",
+      "label": "Next",
+      "hint": "committed",
+      "items": [
+        {
+          "area": "Compute",
+          "title": "GPU inference serving",
+          "blurb": "Triton-based model serving with scale-to-zero and fractional-GPU scheduling, so idle models cost nothing and hot ones burst.",
+          "status": "planned"
+        },
+        {
+          "area": "Delivery",
+          "title": "GitOps that tells the truth",
+          "blurb": "Per-app deployment definitions and sync health gated on real apply state — so a green 'Healthy' can never hide a failed change underneath.",
+          "status": "building"
+        },
+        {
+          "area": "Platform",
+          "title": "Self-serve engineer onboarding",
+          "blurb": "One flow from zero to operating the platform: access, identity, and a working kubeconfig, without a human in the loop for each step.",
+          "status": "planned"
+        }
+      ]
+    },
+    {
+      "id": "later",
+      "label": "Later",
+      "hint": "directional",
+      "items": [
+        {
+          "area": "Compute",
+          "title": "Baremetal capacity",
+          "blurb": "Extend beyond managed Kubernetes onto self-run baremetal for denser, cheaper GPU — managed and baremetal under one control plane.",
+          "status": "planned"
+        },
+        {
+          "area": "Security",
+          "title": "Sandboxed multi-tenant compute",
+          "blurb": "Kernel-isolated workloads and per-tenant namespaces so shared execution is safe by construction, not by trust.",
+          "status": "planned"
+        },
+        {
+          "area": "Operations",
+          "title": "Cost transparency",
+          "blurb": "Real per-service cost surfaced inside the platform. Transparency about spend is identity here, not a feature.",
+          "status": "planned"
+        }
+      ]
+    }
+  ]
+}
