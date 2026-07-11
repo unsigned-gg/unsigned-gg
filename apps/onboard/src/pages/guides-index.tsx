@@ -28,6 +28,16 @@ export default function GuidesIndex() {
       </ul>
       <p className="mt-8 font-mono text-[11px] text-dim">
         bundled with the app — sourced from the platform repo, no fetches.
+        the full curated index lives at{" "}
+        <a
+          href="https://github.com/unsigned-gg/unsigned-paas/tree/main/awesome-unsigned"
+          className="text-mid underline hover:text-signal"
+          target="_blank"
+          rel="noreferrer"
+        >
+          awesome-unsigned
+        </a>{" "}
+        (repo access required).
       </p>
     </main>
   );

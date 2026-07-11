@@ -28,14 +28,9 @@
 
   <main id="main" tabindex="-1" aria-live="polite"></main>
 
-  <div class="palette-wrap" role="dialog" aria-modal="true" aria-label="command bar">
-    <div class="scrim"></div>
-    <div class="palette">
-      <input type="text" placeholder="jump to a section, or type a command…" aria-label="command bar input"
-             role="combobox" aria-expanded="true" spellcheck="false" autocomplete="off" />
-      <ul role="listbox"></ul>
-    </div>
-  </div>
+  <!-- ⌘K command bar: shared engine (@unsigned-gg/palette, /palette.js) owns
+       the dialog DOM; items live in app.js. Migrated from the bespoke
+       implementation (roadmap P5, OPS-580). -->
 
   <noscript>
     <main style="margin:80px auto;max-width:640px;padding:0 24px">
@@ -46,6 +41,7 @@
     </main>
   </noscript>
 
+  <script src="/palette.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

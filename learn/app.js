@@ -260,7 +260,25 @@ KUBECONFIG=~/.kube/&lt;env&gt;.yaml kubectl get nodes<button class="copy-btn">co
     <p>One hardening rule worth knowing early: apps that autoscale get their <code>replicas</code>
     excluded from sync — otherwise server-side apply would arm-wrestle the autoscaler on every
     reconcile. Forced-SSA-vs-autoscaler is a real fight; the platform declines it structurally.</p>
-    ${sot(['gitops/argocd-apps/unsigned-paas-apps.yaml', 'docs/argocd-appset-hardening.md', 'docs/chart-versioning-design.md'])}`,
+    <h2>When the sync goes red.</h2>
+    <p>The debug ladder, in the order that finds it fastest — each rung is one command:</p>
+    <ol class="debug-ladder">
+      <li><strong>App status</strong> — <code>kubectl -n argocd get application &lt;app&gt;</code>.
+        <code>OutOfSync</code> means live ≠ pinned (someone touched the cluster by hand, or the pin
+        points at a version the registry doesn't have). <code>Degraded</code> means pods.</li>
+      <li><strong>Pods</strong> — <code>kubectl -n &lt;ns&gt; get pods</code>, then
+        <code>describe</code> the sad one. <code>ImagePullBackOff</code> = tag doesn't exist or pull
+        secret missing · <code>CrashLoopBackOff</code> = read the logs · <code>Pending</code> =
+        resources, affinity, or an unbound PVC · <code>OOMKilled</code> = raise the memory limit.</li>
+      <li><strong>Events</strong> — <code>kubectl -n &lt;ns&gt; get events --sort-by='.lastTimestamp'</code>.
+        The scheduler and kubelet narrate here.</li>
+      <li><strong>NetworkPolicy</strong> — pod runs but can't reach anything? Every chart ships its
+        own policy; the usual missing egress allowances are the registry, DNS, and upstream APIs.</li>
+      <li><strong>Admission</strong> — rejected outright? <code>kubectl get clusterpolicies</code>
+        (what's enforced vs audit) and <code>kubectl -n &lt;ns&gt; get policyreport</code>. Policies
+        ramp audit → warn → enforce, so today's report line is next month's block — fix it either way.</li>
+    </ol>
+    ${sot(['gitops/argocd-apps/unsigned-paas-apps.yaml', 'docs/argocd-appset-hardening.md', 'docs/chart-versioning-design.md', 'awesome-unsigned/faq/common-questions.md'])}`,
 
   ingress: () => `
     <div class="crumb"><span class="addr">0x03</span> · platform</div>
@@ -851,12 +869,9 @@ function onGateChange() {
   renderRail();
 }
 
-/* ---------- command palette ---------- */
-const paletteWrap = $('.palette-wrap');
-const palInput = $('.palette input');
-const palList = $('.palette ul');
-let palSel = 0;
-
+/* ---------- command palette (shared engine: /palette.js, OPS-580) ----------
+   The engine owns the dialog DOM, ⌘K/Ctrl-K, '/', Escape, and arrow keys;
+   this list is /learn's own — lock state is read at each keystroke. */
 function palItems(q) {
   const actions = [
     ...ROUTES.filter(r => !r.hidden).map(r => ({
@@ -871,31 +886,12 @@ function palItems(q) {
   const needle = q.trim().toLowerCase();
   return needle ? actions.filter(a => (a.hex + ' ' + a.label).toLowerCase().includes(needle)) : actions;
 }
-
-function palRender() {
-  const items = palItems(palInput.value);
-  palSel = Math.min(palSel, Math.max(0, items.length - 1));
-  palList.innerHTML = items.length
-    ? items.map((a, i) => `<li role="option" aria-selected="${i === palSel}" data-i="${i}">
-        <span class="hx">${esc(a.hex)}</span>${esc(a.label)}${a.k2 ? `<span class="k2">${esc(a.k2)}</span>` : ''}</li>`).join('')
-    : '<div class="empty">nothing at that address. try an explainer name.</div>';
-  $$('li', palList).forEach(li => {
-    li.addEventListener('click', () => { items[+li.dataset.i].run(); palClose(); });
-    li.addEventListener('mousemove', () => { palSel = +li.dataset.i; $$('li', palList).forEach((x, i) => x.setAttribute('aria-selected', String(i === palSel))); });
-  });
-  return items;
-}
-function palOpen() { paletteWrap.classList.add('open'); palInput.value = ''; palSel = 0; palRender(); palInput.focus(); }
-function palClose() { paletteWrap.classList.remove('open'); main.focus({ preventScroll: true }); }
-palInput.addEventListener('input', () => { palSel = 0; palRender(); });
-palInput.addEventListener('keydown', (e) => {
-  const items = palItems(palInput.value);
-  if (e.key === 'ArrowDown') { e.preventDefault(); palSel = (palSel + 1) % items.length; palRender(); }
-  else if (e.key === 'ArrowUp') { e.preventDefault(); palSel = (palSel - 1 + items.length) % items.length; palRender(); }
-  else if (e.key === 'Enter' && items[palSel]) { items[palSel].run(); palClose(); }
+const palBar = UnsignedPalette.init({
+  getItems: palItems,
+  placeholder: 'jump to a section, or type a command…',
+  emptyText: 'nothing at that address. try an explainer name.',
 });
-$('.palette-wrap .scrim').addEventListener('click', palClose);
-$('.kbd-hint').addEventListener('click', palOpen);
+$('.kbd-hint').addEventListener('click', palBar.open);
 
 function showHelp() {
   location.hash = '#/home';
@@ -912,12 +908,11 @@ everything is reachable by Tab — focus rings are designed, not default.`), 50)
 
 /* ---------- global keyboard ---------- */
 addEventListener('keydown', (e) => {
+  // ⌘K / '/' / Escape belong to the shared palette engine; while the
+  // palette is open its input has focus, so the typing guard covers it.
   const typing = /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName || '');
-  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); paletteWrap.classList.contains('open') ? palClose() : palOpen(); return; }
-  if (paletteWrap.classList.contains('open')) { if (e.key === 'Escape') palClose(); return; }
   if (typing) return;
-  if (e.key === '/') { e.preventDefault(); palOpen(); }
-  else if (e.key === '?') { e.preventDefault(); showHelp(); }
+  if (e.key === '?') { e.preventDefault(); showHelp(); }
   else if (e.key === '[' || e.key === ']') {
     const i = order.indexOf(current().id);
     const next = order[e.key === '[' ? Math.max(0, i - 1) : Math.min(order.length - 1, i + 1)];
