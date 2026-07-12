@@ -1,0 +1,19 @@
+──────────────────────────────────────────────────────────────────────
+  unsigned // {PRODUCT} {VERSION}
+──────────────────────────────────────────────────────────────────────
+  released   {YYYY-MM-DD}
+  what       {one dry line — what this release is}
+  size       {binary / artifact size — the bit is the brand}
+
+  {notes — terse, optional; what changed, what to know}
+
+  — shipped unsigned
+  greetz: {sibling projects / handles this release stands on}
+──────────────────────────────────────────────────────────────────────
+
+# The NFO — usage
+# The scene's release note, kept to its sensibility, not its costume:
+#   - terse, ruled with box-drawing lines, monospace. No ANSI-art walls.
+#   - a sig ("— shipped unsigned") and one greetz line. No l33t body copy.
+#   - one per RELEASE, not per surface. Fill the {braces}; delete this block.
+# See .impeccable.md §Voice lineage.
