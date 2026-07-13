@@ -173,8 +173,8 @@
     /* terminal mockup */
     .hero-terminal {
       border: 1px solid var(--border);
-      border-top: 2px solid var(--green);
-      background: var(--surface);
+      border-top: 2px solid var(--ot-accent, var(--green));
+      background: var(--ot-bg, var(--surface));
     }
     .term-bar {
       padding: 9px 16px; border-bottom: 1px solid var(--border);
@@ -182,23 +182,23 @@
       font-family: var(--mono); font-size: var(--text-micro);
       color: var(--dim); letter-spacing: var(--track-caps);
     }
-    .term-bar .term-live { color: var(--green); }
+    .term-bar .term-live { color: var(--ot-accent, var(--green)); }
     .term-body {
       padding: 20px; font-family: var(--mono);
       font-size: var(--text-meta); line-height: var(--text-line-airy);
       overflow-x: auto;
     }
-    .t-prompt { color: var(--green); }
-    .t-cmd { color: var(--bright); }
-    .t-out { color: var(--mid); }
-    .t-dim { color: var(--dim); }
-    .t-green { color: var(--green); }
-    .t-blue { color: var(--blue); }
+    .t-prompt { color: var(--ot-prompt, var(--green)); }
+    .t-cmd { color: var(--ot-cmd, var(--bright)); }
+    .t-out { color: var(--ot-out, var(--mid)); }
+    .t-dim { color: var(--ot-dim, var(--dim)); }
+    .t-green { color: var(--ot-accent, var(--green)); }
+    .t-blue { color: var(--ot-blue, var(--blue)); }
     .t-purple { color: var(--purple); }
     .t-orange { color: var(--orange); }
     .t-cursor {
       display: inline-block; width: 7px; height: 13px;
-      background: var(--green); animation: blink 1s infinite;
+      background: var(--ot-accent, var(--green)); animation: blink 1s infinite;
       vertical-align: middle; margin-left: 2px;
     }
     @keyframes blink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
@@ -429,6 +429,17 @@
       .access-inner { grid-template-columns: 1fr; }
       .nav-link.hide-sm { display: none; }
     }
+  
+    /* theme switcher — preview only, Overflow's real palettes */
+    .theme-switch{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:18px;font-family:var(--mono)}
+    .theme-switch .ts-lbl{font-size:var(--text-micro);letter-spacing:var(--track-caps);text-transform:uppercase;color:var(--dim)}
+    .ts-chip{font-family:var(--mono);font-size:var(--text-micro);color:var(--mid);background:transparent;border:1px solid var(--border);border-radius:4px;padding:5px 10px;cursor:pointer;display:inline-flex;gap:7px;align-items:center}
+    .ts-chip:hover{border-color:var(--green);color:var(--bright)}
+    .ts-chip[aria-pressed="true"]{color:var(--bg);background:var(--green);border-color:var(--green);font-weight:var(--weight-medium)}
+    .ts-chip i{width:9px;height:9px;border-radius:2px;display:inline-block}
+    .ts-chip:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+    .ts-note{font-size:var(--text-micro);color:var(--dim)}
+
   </style>
 </head>
 <body>
@@ -490,6 +501,16 @@
         </div>
       </div>
     </div>
+
+    <div class="wrap"><div class="theme-switch" role="group" aria-label="Preview theme">
+      <span class="ts-lbl">theme</span>
+      <button class="ts-chip" aria-pressed="true" data-ot="unsigned"><i style="background:#00e599"></i>unsigned</button>
+      <button class="ts-chip" aria-pressed="false" data-ot="synthwave84"><i style="background:#ff5c8f"></i>synthwave84</button>
+      <button class="ts-chip" aria-pressed="false" data-ot="solarized"><i style="background:#268bd2"></i>solarized</button>
+      <button class="ts-chip" aria-pressed="false" data-ot="dim"><i style="background:#5faf5f"></i>dim</button>
+      <button class="ts-chip" aria-pressed="false" data-ot="highcontrast"><i style="background:#00ff00"></i>high-contrast</button>
+      <span class="ts-note">+ 3 more · a theme is a TOML file, never hardcoded</span>
+    </div></div>
 
     <!-- readout strip -->
     <div class="readout">
@@ -978,5 +999,25 @@
     }, { threshold: 0.08 });
     document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
   </script>
+<script>
+(function(){
+  var T={
+    unsigned:{a:"#00e599",bg:"#0a0a0a",prompt:"#00e599",cmd:"#e0e0e0",out:"rgba(255,255,255,.62)",dim:"rgba(255,255,255,.4)",blue:"#4d9fff"},
+    synthwave84:{a:"#72f1b8",bg:"#262335",prompt:"#ff5c8f",cmd:"#e4e4e7",out:"#b6b0c4",dim:"#6d6785",blue:"#03aeff"},
+    solarized:{a:"#859900",bg:"#002b36",prompt:"#859900",cmd:"#eee8d5",out:"#93a1a1",dim:"#586e75",blue:"#268bd2"},
+    dim:{a:"#5faf5f",bg:"#1a1a1a",prompt:"#5faf5f",cmd:"#c8c8c8",out:"#a0a0a0",dim:"#6a6a6a",blue:"#5f8faf"},
+    highcontrast:{a:"#00ff00",bg:"#000000",prompt:"#00ff00",cmd:"#ffffff",out:"#e0e0e0",dim:"#9a9a9a",blue:"#4d9fff"}
+  };
+  var term=document.querySelector('.hero-terminal');
+  function apply(k){var t=T[k];if(!t||!term)return;
+    ['accent','bg','prompt','cmd','out','dim','blue'].forEach(function(v){
+      term.style.setProperty('--ot-'+v, t[v==='accent'?'a':v]);});}
+  document.querySelectorAll('.ts-chip[data-ot]').forEach(function(c){
+    c.addEventListener('click',function(){
+      document.querySelectorAll('.ts-chip[data-ot]').forEach(function(x){x.setAttribute('aria-pressed','false');});
+      c.setAttribute('aria-pressed','true'); apply(c.dataset.ot);});
+  });
+})();
+</script>
 </body>
 </html>
