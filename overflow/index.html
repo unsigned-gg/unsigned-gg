@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>overflow — the terminal that doesn't fit in the buffer</title>
+  <meta name="description" content="A Windows-first, GPU-accelerated terminal emulator in Rust. VT/ANSI parser, wgpu rendering, shell integration, image protocols, agent-aware mux. MIT." />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <meta name="theme-color" content="#0a0a0a" />
+  <link rel="canonical" href="https://unsigned.gg/overflow/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://unsigned.gg/overflow/" />
+  <meta property="og:title" content="overflow — the terminal that doesn't fit in the buffer" />
+  <meta property="og:description" content="A Windows-first, GPU-accelerated terminal emulator in Rust. VT/ANSI parser, wgpu rendering, shell integration, image protocols, agent-aware mux." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/tokens.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --gutter: clamp(24px, 5vw, 64px);
+      --measure: 1200px;
+    }
+
+    html { scroll-behavior: smooth; }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+    body {
+      background: var(--bg);
+      color: var(--white);
+      font-family: var(--sans);
+      font-weight: var(--weight-regular);
+      font-size: var(--text-lede);
+      line-height: var(--text-line);
+      overflow-x: hidden;
+    }
+
+    /* engineering grid backdrop */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    ::selection { background: var(--green-dim); color: var(--green); }
+
+    .wrap {
+      max-width: var(--measure);
+      margin: 0 auto;
+      padding-left: var(--gutter);
+      padding-right: var(--gutter);
+    }
+
+    /* ── NAV ─────────────────────────────────────────────────────────── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      border-bottom: 1px solid var(--border);
+      background: rgba(10,10,10,0.92);
+      backdrop-filter: blur(20px);
+    }
+    .nav-inner {
+      max-width: var(--measure);
+      margin: 0 auto;
+      padding: 16px var(--gutter);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 24px;
+    }
+    .nav-logo {
+      font-family: var(--mono);
+      font-size: var(--text-prose);
+      font-weight: var(--weight-medium);
+      color: var(--white);
+      text-decoration: none;
+      letter-spacing: var(--track-tight);
+    }
+    .nav-logo span { color: var(--green); }
+    .nav-right { display: flex; align-items: center; gap: 24px; }
+    .nav-link {
+      font-family: var(--mono);
+      font-size: var(--text-meta);
+      color: var(--dim);
+      text-decoration: none;
+      letter-spacing: var(--track-open);
+      transition: color 0.2s;
+    }
+    .nav-link:hover { color: var(--green); }
+    .nav-link .idx { color: var(--green); opacity: 0.7; margin-right: 4px; }
+    .kbd-chip {
+      font-family: var(--mono); font-size: var(--text-label); color: var(--dim);
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm);
+      padding: 3px 8px; cursor: pointer;
+    }
+    .kbd-chip:hover { color: var(--green); border-color: var(--border-hover); }
+    .nav-status {
+      display: flex; align-items: center; gap: 8px;
+      font-family: var(--mono); font-size: var(--text-label);
+      color: var(--dim); letter-spacing: var(--track-open);
+    }
+    .status-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--green); box-shadow: 0 0 8px var(--green);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    @media (prefers-reduced-motion: reduce) { .status-dot { animation: none; } }
+
+    /* ── HERO ────────────────────────────────────────────────────────── */
+    .hero {
+      position: relative; z-index: 1;
+      padding: clamp(120px, 16vh, 170px) 0 0;
+    }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      gap: clamp(32px, 5vw, 72px);
+      align-items: center;
+    }
+    .hero-headline {
+      font-size: var(--text-display-xl);
+      font-weight: var(--weight-semibold);
+      line-height: var(--text-line-display);
+      letter-spacing: var(--track-tight);
+      margin-bottom: 24px;
+    }
+    .hero-headline .accent { color: var(--green); }
+    .hero-headline .strike {
+      position: relative; color: var(--dim); white-space: nowrap;
+    }
+    .hero-headline .strike::after {
+      content: ''; position: absolute;
+      left: -2%; right: -2%; top: 54%; height: 3px;
+      background: var(--green); transform: rotate(-1.2deg);
+    }
+    .hero-sub {
+      font-size: var(--text-prose);
+      color: var(--mid);
+      line-height: var(--text-line-loose);
+      max-width: 480px;
+      margin-bottom: 36px;
+      font-weight: var(--weight-light);
+    }
+    .hero-sub strong { color: var(--bright); font-weight: var(--weight-medium); }
+    .hero-cta { display: flex; gap: 14px; flex-wrap: wrap; }
+    .btn-primary {
+      background: var(--green); color: var(--bg); border: none;
+      padding: 14px 28px; font-family: var(--mono);
+      font-size: var(--text-body-s); font-weight: var(--weight-medium);
+      letter-spacing: var(--track-open); cursor: pointer;
+      transition: background 0.2s, transform 0.2s;
+      text-decoration: none; display: inline-block;
+    }
+    .btn-primary:hover { background: var(--white); transform: translateY(-1px); }
+    .btn-ghost {
+      border: 1px solid var(--border); background: transparent;
+      color: var(--dim); padding: 14px 28px; font-family: var(--mono);
+      font-size: var(--text-body-s); letter-spacing: var(--track-open);
+      cursor: pointer; transition: border-color 0.2s, color 0.2s;
+      text-decoration: none; display: inline-block;
+    }
+    .btn-ghost:hover { border-color: var(--green); color: var(--green); }
+
+    /* terminal mockup */
+    .hero-terminal {
+      border: 1px solid var(--border);
+      border-top: 2px solid var(--ot-accent, var(--green));
+      background: var(--ot-bg, var(--surface));
+    }
+    .term-bar {
+      padding: 9px 16px; border-bottom: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+      font-family: var(--mono); font-size: var(--text-micro);
+      color: var(--dim); letter-spacing: var(--track-caps);
+    }
+    .term-bar .term-live { color: var(--ot-accent, var(--green)); }
+    .term-body {
+      padding: 20px; font-family: var(--mono);
+      font-size: var(--text-meta); line-height: var(--text-line-airy);
+      overflow-x: auto;
+    }
+    .t-prompt { color: var(--ot-prompt, var(--green)); }
+    .t-cmd { color: var(--ot-cmd, var(--bright)); }
+    .t-out { color: var(--ot-out, var(--mid)); }
+    .t-dim { color: var(--ot-dim, var(--dim)); }
+    .t-green { color: var(--ot-accent, var(--green)); }
+    .t-blue { color: var(--ot-blue, var(--blue)); }
+    .t-purple { color: var(--purple); }
+    .t-orange { color: var(--orange); }
+    .t-cursor {
+      display: inline-block; width: 7px; height: 13px;
+      background: var(--ot-accent, var(--green)); animation: blink 1s infinite;
+      vertical-align: middle; margin-left: 2px;
+    }
+    @keyframes blink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+    @media (prefers-reduced-motion: reduce) { .t-cursor { animation: none; } }
+
+    /* readout strip */
+    .readout {
+      margin-top: clamp(48px, 8vh, 80px);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background: rgba(17,17,17,0.5);
+    }
+    .readout-inner {
+      max-width: var(--measure); margin: 0 auto;
+      padding: 14px var(--gutter);
+      display: flex; gap: clamp(18px, 4vw, 48px);
+      font-family: var(--mono); font-size: var(--text-label);
+      letter-spacing: var(--track-open); color: var(--dim);
+      overflow-x: auto; white-space: nowrap;
+    }
+    .readout-inner b { color: var(--green); font-weight: var(--weight-regular); }
+
+    /* ── SECTIONS ────────────────────────────────────────────────────── */
+    section { position: relative; z-index: 1; }
+    .sec {
+      padding: clamp(72px, 11vh, 120px) 0;
+      border-top: 1px solid var(--border);
+    }
+    .sec-head {
+      display: flex; align-items: baseline; gap: 16px;
+      margin-bottom: clamp(36px, 6vh, 56px);
+    }
+    .sec-idx {
+      font-family: var(--mono); font-size: var(--text-meta);
+      color: var(--green); letter-spacing: var(--track-caps);
+    }
+    .sec-title {
+      font-size: var(--text-display-m); font-weight: var(--weight-semibold);
+      line-height: var(--text-line-display); letter-spacing: var(--track-tight);
+    }
+    .sec-sub {
+      font-size: var(--text-body); color: var(--dim);
+      max-width: 520px; margin-top: 12px;
+    }
+
+    /* ── 01 FEATURES — ledger ───────────────────────────────────────── */
+    .ledger { border-top: 1px solid var(--border); }
+    .ledger-row {
+      display: grid;
+      grid-template-columns: 72px minmax(180px, 300px) 1fr;
+      gap: clamp(16px, 3vw, 40px);
+      padding: 26px 0; border-bottom: 1px solid var(--border);
+      transition: background 0.2s;
+    }
+    .ledger-row:hover { background: var(--green-glow); }
+    .ledger-no {
+      font-family: var(--mono); font-size: var(--text-meta);
+      color: var(--dim); padding-top: 4px;
+    }
+    .ledger-row:hover .ledger-no { color: var(--green); }
+    .ledger-title {
+      font-size: var(--text-prose); font-weight: var(--weight-medium);
+      letter-spacing: var(--track-tight); line-height: var(--text-line-tight);
+    }
+    .ledger-desc {
+      font-size: var(--text-body); color: var(--dim);
+      line-height: var(--text-line-loose); max-width: 60ch;
+    }
+    .ledger-desc code {
+      font-family: var(--mono); font-size: var(--text-meta); color: var(--mid);
+    }
+    .ledger-status {
+      font-family: var(--mono); font-size: var(--text-micro);
+      letter-spacing: var(--track-caps); text-transform: uppercase;
+      padding: 2px 8px; border-radius: var(--radius-xs);
+      display: inline-block; margin-bottom: 8px;
+    }
+    .ledger-status.done { color: var(--green); background: var(--green-dim); }
+    .ledger-status.next { color: var(--blue); background: rgba(77,159,255,0.08); }
+    .ledger-status.future { color: var(--dim); background: var(--surface-2); }
+
+    /* ── 02 SPEC SHEET ───────────────────────────────────────────────── */
+    .spec { border: 1px solid var(--border); background: var(--surface); }
+    .spec-group { border-bottom: 1px solid var(--border); }
+    .spec-group:last-child { border-bottom: none; }
+    .spec-group-head {
+      padding: 12px 20px; font-family: var(--mono);
+      font-size: var(--text-micro); letter-spacing: var(--track-wide);
+      text-transform: uppercase; color: var(--green);
+      background: rgba(0,229,153,0.04);
+      border-bottom: 1px solid var(--border);
+    }
+    .spec-rows { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+    .spec-row {
+      display: flex; justify-content: space-between; align-items: baseline;
+      gap: 12px; padding: 14px 20px;
+      border-right: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      margin-right: -1px; margin-bottom: -1px;
+    }
+    .spec-key {
+      font-family: var(--mono); font-size: var(--text-micro);
+      letter-spacing: var(--track-caps); text-transform: uppercase;
+      color: var(--dim);
+    }
+    .spec-val {
+      font-size: var(--text-body-s); font-weight: var(--weight-medium);
+      color: var(--bright); text-align: right;
+    }
+
+    /* ── 03 ROADMAP ─────────────────────────────────────────────────── */
+    .phase-grid { display: grid; grid-template-columns: 1fr; gap: 0; }
+    .phase-row {
+      display: grid;
+      grid-template-columns: 100px minmax(140px, 200px) 1fr 120px;
+      gap: clamp(16px, 3vw, 32px);
+      padding: 20px 0; border-bottom: 1px solid var(--border);
+      align-items: baseline; transition: background 0.2s;
+    }
+    .phase-row:hover { background: var(--green-glow); }
+    .phase-ver {
+      font-family: var(--mono); font-size: var(--text-body-s);
+      color: var(--dim); letter-spacing: var(--track-open);
+    }
+    .phase-name {
+      font-size: var(--text-body); font-weight: var(--weight-medium);
+      color: var(--white); letter-spacing: var(--track-tight);
+    }
+    .phase-desc {
+      font-size: var(--text-body-s); color: var(--dim);
+      line-height: var(--text-line);
+    }
+    .phase-status {
+      font-family: var(--mono); font-size: var(--text-micro);
+      letter-spacing: var(--track-caps); text-transform: uppercase;
+      text-align: right;
+    }
+    .phase-status.done { color: var(--green); }
+    .phase-status.current { color: var(--green); }
+    .phase-status.next { color: var(--blue); }
+    .phase-status.future { color: var(--dim); }
+
+    /* ── 04 COMPARISON ──────────────────────────────────────────────── */
+    .compare {
+      border: 1px solid var(--border); background: var(--surface);
+      overflow-x: auto;
+    }
+    .compare table { width: 100%; border-collapse: collapse; font-size: var(--text-body-s); }
+    .compare th, .compare td {
+      padding: 12px 16px; text-align: left;
+      border-bottom: 1px solid var(--border);
+      border-right: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    .compare th:last-child, .compare td:last-child { border-right: none; }
+    .compare thead th {
+      font-family: var(--mono); font-size: var(--text-micro);
+      letter-spacing: var(--track-caps); text-transform: uppercase;
+      color: var(--dim); background: var(--surface-2);
+      position: sticky; top: 0;
+    }
+    .compare thead th.col-overflow { color: var(--green); }
+    .compare tbody td.col-overflow {
+      font-weight: var(--weight-medium); color: var(--green);
+      background: rgba(0,229,153,0.04);
+    }
+    .compare .yes { color: var(--green); }
+    .compare .no { color: var(--dim); }
+    .compare .na { color: rgba(255,255,255,0.2); }
+
+    /* ── 05 ACCESS ──────────────────────────────────────────────────── */
+    .access-inner {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+      gap: clamp(32px, 6vw, 80px); align-items: center;
+    }
+    .access-title {
+      font-size: var(--text-display-l); font-weight: var(--weight-semibold);
+      letter-spacing: var(--track-tight); line-height: var(--text-line-display);
+      margin-bottom: 18px;
+    }
+    .access-desc {
+      font-size: var(--text-lede); color: var(--mid);
+      line-height: var(--text-line-loose); max-width: 52ch; margin-bottom: 32px;
+    }
+    .access-aside {
+      border: 1px solid var(--border); background: var(--surface);
+      padding: 24px 28px; font-family: var(--mono);
+      font-size: var(--text-meta); line-height: var(--text-line-airy); color: var(--dim);
+    }
+    .access-aside .k { color: var(--green); }
+
+    /* ── FOOTER ─────────────────────────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--border);
+      position: relative; z-index: 1;
+    }
+    .footer-inner {
+      max-width: var(--measure); margin: 0 auto;
+      padding: 32px var(--gutter);
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 20px; flex-wrap: wrap;
+    }
+    .footer-logo { font-family: var(--mono); font-size: var(--text-body); font-weight: var(--weight-medium); color: var(--white); }
+    .footer-logo span { color: var(--green); }
+    .footer-copy { font-size: var(--text-label); color: var(--dim); letter-spacing: var(--track-open); margin-top: 4px; }
+    .footer-links { display: flex; gap: 24px; }
+    .footer-links a {
+      font-family: var(--mono); font-size: var(--text-label);
+      color: var(--dim); text-decoration: none; transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--green); }
+
+    /* ── REVEAL ─────────────────────────────────────────────────────── */
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.6s, transform 0.6s; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { opacity: 1; transform: none; transition: none; }
+    }
+
+    /* ── MOBILE ─────────────────────────────────────────────────────── */
+    @media (max-width: 900px) {
+      .hero-grid { grid-template-columns: 1fr; }
+      .ledger-row { grid-template-columns: 48px 1fr; }
+      .ledger-desc { grid-column: 2; }
+      .phase-row { grid-template-columns: 80px 1fr; }
+      .phase-desc, .phase-status { grid-column: 2; }
+      .access-inner { grid-template-columns: 1fr; }
+      .nav-link.hide-sm { display: none; }
+    }
+  
+    /* theme switcher — preview only, Overflow's real palettes */
+    .theme-switch{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:18px;font-family:var(--mono)}
+    .theme-switch .ts-lbl{font-size:var(--text-micro);letter-spacing:var(--track-caps);text-transform:uppercase;color:var(--dim)}
+    .ts-chip{font-family:var(--mono);font-size:var(--text-micro);color:var(--mid);background:transparent;border:1px solid var(--border);border-radius:4px;padding:5px 10px;cursor:pointer;display:inline-flex;gap:7px;align-items:center}
+    .ts-chip:hover{border-color:var(--green);color:var(--bright)}
+    .ts-chip[aria-pressed="true"]{color:var(--bg);background:var(--green);border-color:var(--green);font-weight:var(--weight-medium)}
+    .ts-chip i{width:9px;height:9px;border-radius:2px;display:inline-block}
+    .ts-chip:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+    .ts-note{font-size:var(--text-micro);color:var(--dim)}
+
+  </style>
+</head>
+<body>
+  <a href="#main" class="skip" style="position:absolute;left:-9999px;">skip to content</a>
+  <a href="#main" class="skip:focus" style="position:absolute;left:-9999px;">skip to content</a>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">unsigned<span>.</span>gg<span style="color:var(--dim)">/overflow</span></a>
+      <div class="nav-right">
+        <a href="#features" class="nav-link"><span class="idx">0x01</span>Features</a>
+        <a href="#spec" class="nav-link hide-sm"><span class="idx">0x02</span>Spec</a>
+        <a href="#roadmap" class="nav-link hide-sm"><span class="idx">0x03</span>Roadmap</a>
+        <a href="#compare" class="nav-link hide-sm"><span class="idx">0x04</span>Compare</a>
+        <a href="#access" class="nav-link"><span class="idx">0x05</span>Access</a>
+        <a href="https://github.com/unsigned-gg/overflow" class="nav-link"><span class="idx">0x06</span>GitHub</a>
+        <button class="kbd-chip" type="button" aria-label="open command bar">⌘K</button>
+        <div class="nav-status">
+          <div class="status-dot"></div>
+          Alpha
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main id="main" tabindex="-1" style="outline:none">
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <h1 class="hero-headline">The terminal<br>that <span class="strike">fits the mold</span> <span class="accent">doesn't fit</span><br>in the buffer.</h1>
+        <p class="hero-sub">A <strong>Windows-first, GPU-accelerated</strong> terminal emulator in Rust. VT/ANSI parser, wgpu rendering, shell integration, image protocols, agent-aware mux. <strong>8.6 MB binary</strong>, zero runtime deps, MIT licensed.</p>
+        <div class="hero-cta">
+          <a href="https://github.com/unsigned-gg/overflow/releases" class="btn-primary">Download</a>
+          <a href="https://github.com/unsigned-gg/overflow" class="btn-ghost">View Source</a>
+        </div>
+      </div>
+
+      <div class="hero-terminal" aria-label="overflow session">
+        <div class="term-bar">
+          <span>overflow — session</span>
+          <span class="term-live">● 60fps</span>
+        </div>
+        <div class="term-body">
+<span class="t-prompt">$ </span><span class="t-cmd">cargo install overflow</span><br>
+<span class="t-green">&#10003;</span> <span class="t-out">Compiling overflow v0.1.0-alpha</span><br>
+<span class="t-green">&#10003;</span> <span class="t-out">wgpu backend: D3D12 (Windows) / Vulkan / Metal</span><br>
+<span class="t-green">&#10003;</span> <span class="t-out">Binary: 8.6 MB (stripped, panic=abort)</span><br>
+<span class="t-green">&#10003;</span> <span class="t-out">Tests: 163 passed (208 with --features images)</span><br>
+<br>
+<span class="t-prompt">$ </span><span class="t-cmd">overflow</span><br>
+<span class="t-dim">┌─────────────────────────────────────────┐</span><br>
+<span class="t-dim">│</span> <span class="t-green">overflow</span> <span class="t-dim">v0.1.0-alpha</span> <span class="t-dim">//</span> <span class="t-out">doesn't fit in the buffer</span> <span class="t-dim">│</span><br>
+<span class="t-dim">└─────────────────────────────────────────┘</span><br>
+<span class="t-dim">//</span> <span class="t-out">7 themes</span> <span class="t-dim">·</span> <span class="t-out">17 commands</span> <span class="t-dim">·</span> <span class="t-out">quake mode</span> <span class="t-dim">·</span> <span class="t-out">blocks</span><br>
+<span class="t-prompt">$ </span><span class="t-cursor"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="wrap"><div class="theme-switch" role="group" aria-label="Preview theme">
+      <span class="ts-lbl">theme</span>
+      <button class="ts-chip" aria-pressed="true" data-ot="unsigned"><i style="background:#00e599"></i>unsigned</button>
+      <button class="ts-chip" aria-pressed="false" data-ot="synthwave84"><i style="background:#ff5c8f"></i>synthwave84</button>
+      <button class="ts-chip" aria-pressed="false" data-ot="solarized"><i style="background:#268bd2"></i>solarized</button>
+      <button class="ts-chip" aria-pressed="false" data-ot="dim"><i style="background:#5faf5f"></i>dim</button>
+      <button class="ts-chip" aria-pressed="false" data-ot="highcontrast"><i style="background:#00ff00"></i>high-contrast</button>
+      <span class="ts-note">+ 3 more · a theme is a TOML file, never hardcoded</span>
+    </div></div>
+
+    <!-- readout strip -->
+    <div class="readout">
+      <div class="readout-inner">
+        <span>render <b>wgpu</b></span>
+        <span>parser <b>vte 0.15</b></span>
+        <span>binary <b>8.6 MB</b></span>
+        <span>tests <b>163</b></span>
+        <span>themes <b>7</b></span>
+        <span>config <b>TOML</b></span>
+        <span>license <b>MIT</b></span>
+        <span>endian <b>little, like nature intended</b></span>
+      </div>
+    </div>
+  </header>
+
+  <!-- 01 FEATURES -->
+  <section class="sec reveal" id="features">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="sec-idx">0x01</span>
+        <div>
+          <h2 class="sec-title">What it does.</h2>
+          <p class="sec-sub">Every feature is built for developers who live in the terminal and run AI agents alongside it. No cloud, no accounts, no telemetry nags.</p>
+        </div>
+      </div>
+
+      <div class="ledger">
+        <div class="ledger-row">
+          <span class="ledger-no">/01</span>
+          <div>
+            <span class="ledger-status done">shipped</span>
+            <h3 class="ledger-title">GPU-accelerated rendering</h3>
+          </div>
+          <p class="ledger-desc">wgpu backend — D3D12 on Windows, Vulkan on Linux, Metal on macOS. One API, three platforms. Glyph atlas with instance-based text rendering, damage tracking, 60fps target. No OpenGL legacy, no CPU-bound rendering.</p>
+        </div>
+        <div class="ledger-row">
+          <span class="ledger-no">/02</span>
+          <div>
+            <span class="ledger-status done">shipped</span>
+            <h3 class="ledger-title">Full VT/ANSI parser</h3>
+          </div>
+          <p class="ledger-desc">vte 0.15 with complete <code>Perform</code> trait. Scroll regions, terminal modes, tab stops, ESC sequences, synchronized output, styled underlines (curly/dotted/dashed), mouse reporting, Kitty keyboard protocol, grapheme clusters, ligature shaping. 77 integration tests against vim, htop, less, tmux.</p>
+        </div>
+        <div class="ledger-row">
+          <span class="ledger-no">/03</span>
+          <div>
+            <span class="ledger-status done">shipped</span>
+            <h3 class="ledger-title">Shell integration &amp; blocks</h3>
+          </div>
+          <p class="ledger-desc">OSC 133 semantic prompt parsing — command/output blocks with exit codes, duration, and timestamps. Block navigation (Ctrl+Shift+Up/Down). Command history (bounded, searchable). Shell scripts for bash, zsh, fish. Like Warp, but local-only: no cloud, no AI, no account.</p>
+        </div>
+        <div class="ledger-row">
+          <span class="ledger-no">/04</span>
+          <div>
+            <span class="ledger-status done">shipped</span>
+            <h3 class="ledger-title">Image protocols</h3>
+          </div>
+          <p class="ledger-desc">Sixel (DCS q), iTerm2 inline images (OSC 1337), Kitty Graphics Protocol (APC pre-scan). Image store with RGBA data and cell placements. WGSL shader for textured quads. DCS hook/put/unhook callbacks. Behind <code>--features images</code>.</p>
+        </div>
+        <div class="ledger-row">
+          <span class="ledger-no">/05</span>
+          <div>
+            <span class="ledger-status done">shipped</span>
+            <h3 class="ledger-title">Command palette &amp; quake mode</h3>
+          </div>
+          <p class="ledger-desc">Ctrl+Shift+P opens a fuzzy-filtered command palette — 17 commands, arrow-key navigation. Ctrl+Grave toggles quake/drop-down mode: borderless, top-half-of-screen, full-width. 7 built-in themes (unsigned, dim, high-contrast, solarized-dark/light, synthwave84, oni).</p>
+        </div>
+        <div class="ledger-row">
+          <span class="ledger-no">/06</span>
+          <div>
+            <span class="ledger-status done">shipped</span>
+            <h3 class="ledger-title">Domain model extraction</h3>
+          </div>
+          <p class="ledger-desc"><code>overflow-domain</code> crate — 28 modules of pure data types (no I/O, no parsing, no rendering). 2-crate Cargo workspace. PGT type schemas for cross-project sharing with godseat. Foundation for mux, remote, demon mode, and attention router.</p>
+        </div>
+        <div class="ledger-row">
+          <span class="ledger-no">/07</span>
+          <div>
+            <span class="ledger-status next">building</span>
+            <h3 class="ledger-title">Agent-aware mux (herdr)</h3>
+          </div>
+          <p class="ledger-desc">Tabs, panes, split/resize. Named sessions with detach/reattach. Agent status bar: <code>blocked</code> / <code>working</code> / <code>done</code> / <code>idle</code> per pane. Detects Claude Code, Codex, Amp, OpenCode via process name or OSC 133 markers.</p>
+        </div>
+        <div class="ledger-row">
+          <span class="ledger-no">/08</span>
+          <div>
+            <span class="ledger-status future">planned</span>
+            <h3 class="ledger-title">Mosh remote (native Windows)</h3>
+          </div>
+          <p class="ledger-desc">No native Mosh client exists on Windows. Overflow speaks the protocol natively — built-in mosh-server (connect from iPhone/Blink) and mosh-client. UDP state sync, predictive local echo, roaming that survives IP changes and sleep/wake.</p>
+        </div>
+        <div class="ledger-row">
+          <span class="ledger-no">/09</span>
+          <div>
+            <span class="ledger-status future">planned</span>
+            <h3 class="ledger-title">Demon mode (operator control surface)</h3>
+          </div>
+          <p class="ledger-desc">Ctrl+Alt+D transforms the terminal into a cluster dashboard. godseat integration: estate sensing, gate classification (Green/Yellow/Red/Never), sign-off prompts, audit trail. Read-only dormancy mode. K8s CRD awareness. No terminal in the landscape has this.</p>
+        </div>
+        <div class="ledger-row">
+          <span class="ledger-no">/10</span>
+          <div>
+            <span class="ledger-status future">planned</span>
+            <h3 class="ledger-title">Attention router</h3>
+          </div>
+          <p class="ledger-desc">When N parallel agent sessions run, one blocks on you — needs permission, has a prompt ready. The router auto-promotes the blocked pane to the driver slot. Engage it, the next waiter surfaces. Drain the queue hands-free without touching the layout.</p>
+        </div>
+        <div class="ledger-row">
+          <span class="ledger-no">/11</span>
+          <div>
+            <span class="ledger-status future">planned</span>
+            <h3 class="ledger-title">Reverie memory + Somnium agents</h3>
+          </div>
+          <p class="ledger-desc">Session snapshots persist to engram — scrollback, block history, agent state survive reboots. Somnium: persistent per-project agents with canon gating and preview deploys. Block history as change timeline. The terminal IS the audit view.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 SPEC SHEET -->
+  <section class="sec reveal" id="spec">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="sec-idx">0x02</span>
+        <div>
+          <h2 class="sec-title">Spec sheet.</h2>
+          <p class="sec-sub">No marketing — just the facts. Read it like a datasheet.</p>
+        </div>
+      </div>
+
+      <div class="spec">
+        <div class="spec-group">
+          <div class="spec-group-head">core</div>
+          <div class="spec-rows">
+            <div class="spec-row"><span class="spec-key">language</span><span class="spec-val">Rust (edition 2021)</span></div>
+            <div class="spec-row"><span class="spec-key">renderer</span><span class="spec-val">wgpu 30 (D3D12 / Vulkan / Metal)</span></div>
+            <div class="spec-row"><span class="spec-key">parser</span><span class="spec-val">vte 0.15 (full Perform trait)</span></div>
+            <div class="spec-row"><span class="spec-key">pty</span><span class="spec-val">ConPTY (Win) / posix_openpt (Unix)</span></div>
+            <div class="spec-row"><span class="spec-key">font</span><span class="spec-val">swash (shaping + rasterization)</span></div>
+            <div class="spec-row"><span class="spec-key">config</span><span class="spec-val">TOML + serde, hot-reload via notify</span></div>
+            <div class="spec-row"><span class="spec-key">binary size</span><span class="spec-val">8.6 MB (stripped, panic=abort)</span></div>
+            <div class="spec-row"><span class="spec-key">license</span><span class="spec-val">MIT</span></div>
+          </div>
+        </div>
+        <div class="spec-group">
+          <div class="spec-group-head">protocols</div>
+          <div class="spec-rows">
+            <div class="spec-row"><span class="spec-key">SGR</span><span class="spec-val">bold, italic, underline, reverse, strikethrough, faint, conceal</span></div>
+            <div class="spec-row"><span class="spec-key">color</span><span class="spec-val">8+8 standard, 256-color, 24-bit true color</span></div>
+            <div class="spec-row"><span class="spec-key">underlines</span><span class="spec-val">straight, double, curly, dotted, dashed</span></div>
+            <div class="spec-row"><span class="spec-key">mouse</span><span class="spec-val">SGR (?1006), X10 (?1002), all-motion (?1003)</span></div>
+            <div class="spec-row"><span class="spec-key">keyboard</span><span class="spec-val">Kitty (?2017), app cursor, app keypad</span></div>
+            <div class="spec-row"><span class="spec-key">clipboard</span><span class="spec-val">OSC 52 (base64, SSH-safe)</span></div>
+            <div class="spec-row"><span class="spec-key">hyperlinks</span><span class="spec-val">OSC 8 (URI interning)</span></div>
+            <div class="spec-row"><span class="spec-key">images</span><span class="spec-val">Sixel, iTerm2 (OSC 1337), Kitty (APC)</span></div>
+            <div class="spec-row"><span class="spec-key">shell int</span><span class="spec-val">OSC 133 (A/B/C/D semantic prompts)</span></div>
+            <div class="spec-row"><span class="spec-key">sync output</span><span class="spec-val">?2026 (flicker-free TUIs)</span></div>
+          </div>
+        </div>
+        <div class="spec-group">
+          <div class="spec-group-head">features</div>
+          <div class="spec-rows">
+            <div class="spec-row"><span class="spec-key">default</span><span class="spec-val">clipboard, config-watch</span></div>
+            <div class="spec-row"><span class="spec-key">optional</span><span class="spec-val">images, shaping, network, telemetry</span></div>
+            <div class="spec-row"><span class="spec-key">themes</span><span class="spec-val">7 built-in + user TOML themes</span></div>
+            <div class="spec-row"><span class="spec-key">command palette</span><span class="spec-val">17 commands, fuzzy filter</span></div>
+            <div class="spec-row"><span class="spec-key">quake mode</span><span class="spec-val">Ctrl+Grave, borderless top-half</span></div>
+            <div class="spec-row"><span class="spec-key">font resize</span><span class="spec-val">Ctrl+Plus/Minus/0</span></div>
+            <div class="spec-row"><span class="spec-key">fullscreen</span><span class="spec-val">F11</span></div>
+            <div class="spec-row"><span class="spec-key">block nav</span><span class="spec-val">Ctrl+Shift+Up/Down</span></div>
+            <div class="spec-row"><span class="spec-key">tests</span><span class="spec-val">163 default (208 with images)</span></div>
+            <div class="spec-row"><span class="spec-key">clippy</span><span class="spec-val">clean, -D warnings</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 ROADMAP -->
+  <section class="sec reveal" id="roadmap">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="sec-idx">0x03</span>
+        <div>
+          <h2 class="sec-title">Roadmap to v1.0.0.</h2>
+          <p class="sec-sub">11 phases, each a version bump. 6 shipped, 5 ahead. No dates we can't keep.</p>
+        </div>
+      </div>
+
+      <div class="phase-grid">
+        <div class="phase-row">
+          <span class="phase-ver">v0.1.0-alpha</span>
+          <span class="phase-name">MVP terminal</span>
+          <span class="phase-desc">Type a command, see colored output. VT/ANSI parser, wgpu surface, async PTY, config, telemetry.</span>
+          <span class="phase-status done">shipped</span>
+        </div>
+        <div class="phase-row">
+          <span class="phase-ver">v0.2.0-alpha</span>
+          <span class="phase-name">Alacritty parity</span>
+          <span class="phase-desc">Full VT/ANSI parser: scroll regions, modes, tab stops, styled underlines, mouse, keyboard, graphemes, ligatures, damage tracking, 77 integration tests.</span>
+          <span class="phase-status done">shipped</span>
+        </div>
+        <div class="phase-row">
+          <span class="phase-ver">v0.3.0-alpha</span>
+          <span class="phase-name">herdr mux</span>
+          <span class="phase-desc">Agent-aware mux: tabs, panes, split/resize, detach/reattach, agent status bar (blocked/working/done/idle).</span>
+          <span class="phase-status next">building</span>
+        </div>
+        <div class="phase-row">
+          <span class="phase-ver">v0.4.0-alpha</span>
+          <span class="phase-name">Blocks</span>
+          <span class="phase-desc">OSC 133 semantic prompts, block detection, command history, block navigation, shell integration scripts.</span>
+          <span class="phase-status done">shipped</span>
+        </div>
+        <div class="phase-row">
+          <span class="phase-ver">v0.5.0-alpha</span>
+          <span class="phase-name">Images</span>
+          <span class="phase-desc">Sixel, iTerm2 inline images, Kitty Graphics Protocol. Image store, WGSL shader, DCS callbacks.</span>
+          <span class="phase-status done">shipped</span>
+        </div>
+        <div class="phase-row">
+          <span class="phase-ver">v0.6.0-alpha</span>
+          <span class="phase-name">Mosh remote</span>
+          <span class="phase-desc">Native Windows mosh server/client. UDP state sync, predictive local echo, roaming. Connect from iPhone/Blink.</span>
+          <span class="phase-status future">planned</span>
+        </div>
+        <div class="phase-row">
+          <span class="phase-ver">v0.7.0-alpha</span>
+          <span class="phase-name">Demon mode</span>
+          <span class="phase-desc">godseat integration: estate sensing, gate classification, sign-off prompts, audit trail, dormancy mode, K8s awareness.</span>
+          <span class="phase-status future">planned</span>
+        </div>
+        <div class="phase-row">
+          <span class="phase-ver">v0.8.0-alpha</span>
+          <span class="phase-name">Attention router</span>
+          <span class="phase-desc">Priority queue: blocked panes auto-promote to driver slot. Hold/resume, window isolation, herdr status as signal.</span>
+          <span class="phase-status future">planned</span>
+        </div>
+        <div class="phase-row">
+          <span class="phase-ver">v0.9.0-alpha</span>
+          <span class="phase-name">Reverie memory</span>
+          <span class="phase-desc">Session snapshots to engram. Block metadata persistence. Session restoration on attach. Estate sensing for demon mode.</span>
+          <span class="phase-status future">planned</span>
+        </div>
+        <div class="phase-row">
+          <span class="phase-ver">v0.10.0-alpha</span>
+          <span class="phase-name">Somnium</span>
+          <span class="phase-desc">Persistent per-project agents. Canon-change gating. Preview deployment on agent commit. Block history as change timeline.</span>
+          <span class="phase-status future">planned</span>
+        </div>
+        <div class="phase-row">
+          <span class="phase-ver">v1.0.0</span>
+          <span class="phase-name">Polish</span>
+          <span class="phase-desc">Command palette, quake mode, theme system, config hot-reload, binary size optimization, Windows installer. Feature-complete.</span>
+          <span class="phase-status current">in progress</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 COMPARISON -->
+  <section class="sec reveal" id="compare">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="sec-idx">0x04</span>
+        <div>
+          <h2 class="sec-title">The gap.</h2>
+          <p class="sec-sub">No terminal in the landscape combines Rust + GPU + Windows-first + blocks + agent-mux + all protocols + lightweight. That's the design target.</p>
+        </div>
+      </div>
+
+      <div class="compare">
+        <table>
+          <thead>
+            <tr>
+              <th>terminal</th>
+              <th>lang</th>
+              <th>gpu</th>
+              <th>sixel</th>
+              <th>kitty gfx</th>
+              <th>iterm2</th>
+              <th>osc 8</th>
+              <th>shell int</th>
+              <th>blocks</th>
+              <th>quake</th>
+              <th>themes</th>
+              <th class="col-overflow">agent mux</th>
+              <th class="col-overflow">mosh</th>
+              <th class="col-overflow">demon mode</th>
+              <th class="col-overflow">attention</th>
+              <th>size</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>overflow</strong></td>
+              <td>rust</td>
+              <td class="yes">wgpu</td>
+              <td class="yes">&#10003;</td>
+              <td class="yes">&#10003;</td>
+              <td class="yes">&#10003;</td>
+              <td class="yes">&#10003;</td>
+              <td class="yes">&#10003;</td>
+              <td class="yes">&#10003;</td>
+              <td class="yes">&#10003;</td>
+              <td class="yes">7</td>
+              <td class="col-overflow yes">planned</td>
+              <td class="col-overflow yes">planned</td>
+              <td class="col-overflow yes">planned</td>
+              <td class="col-overflow yes">planned</td>
+              <td><b>8.6 MB</b></td>
+            </tr>
+            <tr>
+              <td>Alacritty</td>
+              <td>rust</td>
+              <td class="yes">opengl</td>
+              <td class="no">&#10007;</td>
+              <td class="no">&#10007;</td>
+              <td class="no">&#10007;</td>
+              <td class="yes">&#10003;</td>
+              <td class="no">&#10007;</td>
+              <td class="no">&#10007;</td>
+              <td class="no">&#10007;</td>
+              <td class="no">0</td>
+              <td class="no">&#10007;</td>
+              <td class="no">&#10007;</td>
+              <td class="no">&#10007;</td>
+              <td class="no">&#10007;</td>
+              <td>~5 MB</td>
+            </tr>
+            <tr>
+              <td>WezTerm</td>
+              <td>rust</td>
+              <td class="yes">custom</td>
+              <td class="yes">&#10003;</td>
+              <td class="yes">&#10003;</td>
+              <td class="yes">&#10003;</td>
+              <td class="yes">&#10003;</td>
+              <td class="yes">&#10003;</td>
+              <td class="no">&#10007;</td>
+              <td class="no">&#10007;</td>
+              <td class="no">0</td>
+              <td class="no">&#10007;</td>
+              <td class="no">&#10007;</td>
+              <td class="no">&#10007;</td>
+              <td class="no">&#10007;</td>
+              <td>~98 MB</td>
+            </tr>
+            <tr>
+              <td>Rio</td>
+              <td>rust</td>
+              <td class="yes">wgpu</td>
+              <td class="yes">&#10003;</td>
+              <td class="no">&#10007;</td>
+              <td class="yes">&#10003;</td>
+              <td class="yes">&#10003;</td>
+              <td class="no">&#10007;</td>
+              <td class="no">&#10007;</td>
+              <td class="no">&#10007;</td>
+              <td class="no">0</td>
+              <td class="no">&#10007;</td>
+              <td class="no">&#10007;</td>
+              <td class="no">&#10007;</td>
+              <td class="no">&#10007;</td>
+              <td>~14 MB</td>
+            </tr>
+            <tr>
+              <td>Warp</td>
+              <td>rust</td>
+              <td class="yes">&#10003;</td>
+              <td class="no">&#10007;</td>
+              <td class="yes">&#10003;</td>
+              <td class="no">&#10007;</td>
+              <td class="no">&#10007;</td>
+              <td class="yes">&#10003;</td>
+              <td class="yes">&#10003;</td>
+              <td class="no">&#10007;</td>
+              <td class="no">0</td>
+              <td class="no">&#10007;</td>
+              <td class="no">&#10007;</td>
+              <td class="no">&#10007;</td>
+              <td class="no">&#10007;</td>
+              <td>~234 MB</td>
+            </tr>
+            <tr>
+              <td>Win Terminal</td>
+              <td>c++</td>
+              <td class="yes">d3d11</td>
+              <td class="yes">&#10003;</td>
+              <td class="no">&#10007;</td>
+              <td class="no">&#10007;</td>
+              <td class="yes">&#10003;</td>
+              <td class="yes">&#10003;</td>
+              <td class="no">&#10007;</td>
+              <td class="yes">&#10003;</td>
+              <td class="no">0</td>
+              <td class="no">&#10007;</td>
+              <td class="no">&#10007;</td>
+              <td class="no">&#10007;</td>
+              <td class="no">&#10007;</td>
+              <td>~43 MB</td>
+            </tr>
+            <tr>
+              <td>Ghostty</td>
+              <td>zig</td>
+              <td class="yes">&#10003;</td>
+              <td class="no">&#10007;</td>
+              <td class="yes">&#10003;</td>
+              <td class="yes">&#10003;</td>
+              <td class="yes">&#10003;</td>
+              <td class="no">&#10007;</td>
+              <td class="no">&#10007;</td>
+              <td class="yes">&#10003;</td>
+              <td class="no">0</td>
+              <td class="no">&#10007;</td>
+              <td class="no">&#10007;</td>
+              <td class="no">&#10007;</td>
+              <td class="no">&#10007;</td>
+              <td>—</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 ACCESS -->
+  <section class="sec reveal" id="access">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="sec-idx">0x05</span>
+        <div>
+          <h2 class="sec-title">Get it.</h2>
+        </div>
+      </div>
+
+      <div class="access-inner">
+        <div>
+          <h3 class="access-title">Open source. No signup. No cloud.</h3>
+          <p class="access-desc">Clone the repo, build with cargo, run. Or grab the alpha release binary. MIT licensed — fork it, ship it, make it yours.</p>
+          <div class="hero-cta">
+            <a href="https://github.com/unsigned-gg/overflow/releases" class="btn-primary">Download v0.1.0-alpha</a>
+            <a href="https://github.com/unsigned-gg/overflow" class="btn-ghost">github.com/unsigned-gg/overflow</a>
+          </div>
+        </div>
+
+        <div class="access-aside">
+          <span class="k">$</span> cargo install overflow<br>
+          <br>
+          <span class="k">$</span> overflow<br>
+          <span style="color:var(--green)">overflow</span> v0.1.0-alpha<br>
+          <span style="color:var(--dim)">// doesn't fit in the buffer</span><br>
+          <br>
+          <span style="color:var(--dim)">// config: ~/.config/overflow/overflow.toml</span><br>
+          <span style="color:var(--dim)">// themes: ~/.config/overflow/themes/</span><br>
+          <span style="color:var(--dim)">// shell: bash, zsh, fish integration</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <div class="footer-logo">unsigned<span>.</span>gg</div>
+        <div class="footer-copy">overflow // the terminal that doesn't fit in the buffer</div>
+      </div>
+      <div class="footer-links">
+        <a href="https://github.com/unsigned-gg/overflow">GitHub</a>
+        <a href="https://github.com/unsigned-gg/overflow/releases">Releases</a>
+        <a href="https://github.com/unsigned-gg/overflow/blob/main/CHANGELOG.md">Changelog</a>
+        <a href="https://github.com/unsigned-gg/overflow/blob/main/CONTRIBUTING.md">Contributing</a>
+        <a href="/">unsigned.gg</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // reveal on scroll
+    const obs = new IntersectionObserver((es) => {
+      es.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.08 });
+    document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+  </script>
+<script>
+(function(){
+  var T={
+    unsigned:{a:"#00e599",bg:"#0a0a0a",prompt:"#00e599",cmd:"#e0e0e0",out:"rgba(255,255,255,.62)",dim:"rgba(255,255,255,.4)",blue:"#4d9fff"},
+    synthwave84:{a:"#72f1b8",bg:"#262335",prompt:"#ff5c8f",cmd:"#e4e4e7",out:"#b6b0c4",dim:"#6d6785",blue:"#03aeff"},
+    solarized:{a:"#859900",bg:"#002b36",prompt:"#859900",cmd:"#eee8d5",out:"#93a1a1",dim:"#586e75",blue:"#268bd2"},
+    dim:{a:"#5faf5f",bg:"#1a1a1a",prompt:"#5faf5f",cmd:"#c8c8c8",out:"#a0a0a0",dim:"#6a6a6a",blue:"#5f8faf"},
+    highcontrast:{a:"#00ff00",bg:"#000000",prompt:"#00ff00",cmd:"#ffffff",out:"#e0e0e0",dim:"#9a9a9a",blue:"#4d9fff"}
+  };
+  var term=document.querySelector('.hero-terminal');
+  function apply(k){var t=T[k];if(!t||!term)return;
+    ['accent','bg','prompt','cmd','out','dim','blue'].forEach(function(v){
+      term.style.setProperty('--ot-'+v, t[v==='accent'?'a':v]);});}
+  document.querySelectorAll('.ts-chip[data-ot]').forEach(function(c){
+    c.addEventListener('click',function(){
+      document.querySelectorAll('.ts-chip[data-ot]').forEach(function(x){x.setAttribute('aria-pressed','false');});
+      c.setAttribute('aria-pressed','true'); apply(c.dataset.ot);});
+  });
+})();
+</script>
+</body>
+</html>
