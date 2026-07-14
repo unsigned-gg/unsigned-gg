@@ -40,6 +40,113 @@ export function guideBySlug(slug: string): Guide | undefined {
 }
 
 export const GUIDES: Guide[] = [
+  // ── day-one-quest ───────────────────────────────────────────────────────────
+  {
+    slug: "day-one-quest",
+    title: "Day one, end to end",
+    purpose: "A guided sequence from a fresh account to proven access to everything. Each step unlocks the next; the last one is how the platform verifies you're live.",
+    sections: [
+      {
+        kind: "p",
+        text: "You arrive with credentials staged across several systems. Run these in order — most legs are operator-provisioned, so where a step is blocked it's a ping, not a debug session. Real hostnames, IPs, and your personal values live in the signed-in Reference (they aren't in this public page); the shape of the day is here.",
+      },
+      { kind: "h2", text: "0. Secure your identity first" },
+      {
+        kind: "p",
+        text: "Log into Google Workspace with your `<you>@cerebral.work` account and the temp password from your secure handoff. You'll be forced to change it — do that, then enroll 2FA immediately. Every downstream login (Keycloak/SSO, the forge) flows through this account.",
+      },
+      { kind: "callout", tone: "warn", text: "If you're 2SV-enrolled and lose your device, a password reset alone won't get you in — you also need a backup code. Ask your operator for one if you're locked out." },
+      { kind: "h2", text: "1. Accept the GitHub org invite" },
+      { kind: "p", text: "Accept the invite to the `unsigned-gg` org and publish your SSH public key on your GitHub profile — the bastion trusts `https://github.com/<handle>.keys` at provision time." },
+      { kind: "h2", text: "2. Join the tailnet — step: access-tailnet" },
+      { kind: "code", lines: ["curl -fsSL https://tailscale.com/install.sh | sh", "sudo tailscale up   # authenticate with your Workspace account"] },
+      { kind: "p", text: "Once your device is authenticated and operator-approved, your engineer network grant goes live (it's staged to merge only once your device exists — no dead-letter grants). This step verifies itself from your authenticated, approved device." },
+      { kind: "h2", text: "3. Sign in to the platform — step: access-keycloak" },
+      { kind: "p", text: "Signing into this app via Keycloak (Google sign-in) IS the proof — the verifier watches login events. Group membership is authorization; if the UI is empty after login, an operator needs to add you to the engineers group. See the login-sso guide." },
+      { kind: "h2", text: "4. kubectl against the cluster — step: access-kubeconfig" },
+      { kind: "p", text: "You'll receive a kubeconfig (OIDC via Keycloak/Google, reached over the tailnet). First call opens a browser to authenticate; then you should see nodes:" },
+      { kind: "code", lines: ["export KUBECONFIG=<your-kubeconfig>", "kubectl get nodes"] },
+      { kind: "h2", text: "5. The LLM gateway" },
+      { kind: "p", text: "You get a personal, budgeted key for the LLM gateway. Confirm it works, then use any model in the catalog. See the llm-gateway guide." },
+      { kind: "code", lines: ["curl https://llm.unsigned.gg/v1/models -H \"Authorization: Bearer $LLM_KEY\""] },
+      { kind: "h2", text: "6. First clone from the forge" },
+      { kind: "p", text: "Clone from the canonical self-hosted Forgejo (GitHub is mirror-only); the exact host is in the signed-in Reference. The tailnet policy repo is a good first read — it's the file that grants your own access." },
+      { kind: "h2", text: "7. Prove access — the closer", id: "proof" },
+      { kind: "p", text: "Mint the `access-kubeconfig` challenge on your board and run the printed command — it writes a ConfigMap `onboard-proof-<nonce>` in YOUR `tenant-<you>` namespace. That single artifact proves a working kubeconfig AND your tenant RBAC; the platform marks you verified when it lands." },
+      { kind: "callout", tone: "info", text: "You're wired in when the proof ConfigMap exists. Good first pickup: the ArgoCD application tree — that's where the cluster's declarative state lives." },
+    ],
+  },
+
+  // ── welcome-email ─────────────────────────────────────────────────────────
+  {
+    slug: "welcome-email",
+    title: "Your welcome email, decoded",
+    purpose: "What the welcome email covers, and the two things only you can do.",
+    sections: [
+      { kind: "p", text: "New engineers get one instructions-only welcome email (it never carries a password — credentials come via a separate secure handoff). It summarizes what's been provisioned and points here." },
+      { kind: "h2", text: "What it lists" },
+      {
+        kind: "list",
+        items: [
+          "Your Google Workspace account (temp password handed over separately).",
+          "GitHub org invite (accept it).",
+          "A personal LLM gateway key (budgeted).",
+          "A tailnet engineer grant, staged to go live once your device joins.",
+          "A kubeconfig for the cluster (OIDC, over the tailnet).",
+          "Platform sign-in via Keycloak (Google), with group membership added by an operator.",
+        ],
+      },
+      { kind: "h2", text: "The two things only you can do" },
+      { kind: "list", ordered: true, items: ["Change your Workspace password and enroll 2FA.", "Accept the GitHub org invite."] },
+      { kind: "callout", tone: "info", text: "Everything else chains from those two. Then run the day-one-quest guide in order." },
+    ],
+  },
+
+  // ── provisioning-overview ───────────────────────────────────────────────────
+  {
+    slug: "provisioning-overview",
+    title: "How provisioning works",
+    purpose: "The legs that get provisioned for a new engineer, what each does, and who owns it.",
+    sections: [
+      { kind: "p", text: "Onboarding runs as a set of independent legs (mirrored from the platform's provisioning pipeline). Most are operator-owed; a couple are self-service. This is the shape — the live per-user values are in the signed-in Reference." },
+      {
+        kind: "table",
+        headers: ["Leg", "What it does", "Owner"],
+        rows: [
+          ["Keycloak", "Creates your realm identity / maps your Google login; group membership = authorization", "operator"],
+          ["Tailnet", "Adds your engineer network grant (staged until your device exists)", "operator (you join the device)"],
+          ["LLM key", "Mints your personal, budgeted gateway key", "operator"],
+          ["Kubeconfig", "Renders your OIDC kubeconfig for the cluster (context tenant-<you>)", "operator"],
+          ["Workspace", "Creates your @cerebral.work account in the members OU", "operator"],
+          ["Welcome email", "Instructions-only note pointing you here (no credentials)", "operator"],
+        ],
+      },
+      { kind: "callout", tone: "info", text: "Access closes out when you log into Keycloak, join the tailnet with an approved device, and write the onboard-proof ConfigMap in your tenant namespace (see day-one-quest §7)." },
+    ],
+  },
+
+  // ── llm-gateway ─────────────────────────────────────────────────────────────
+  {
+    slug: "llm-gateway",
+    title: "The LLM gateway",
+    purpose: "Use your personal key against the OpenAI-compatible model gateway.",
+    sections: [
+      { kind: "p", text: "`https://llm.unsigned.gg/v1` is an OpenAI-compatible gateway fronting many models (Claude, GLM, DeepSeek, Qwen, GPT, Gemini, and more). Every engineer gets a personal key with a spend budget and tags; it comes in your secure handoff, not this page." },
+      { kind: "h2", text: "List the catalog" },
+      { kind: "code", lines: ["curl https://llm.unsigned.gg/v1/models -H \"Authorization: Bearer $LLM_KEY\" | jq -r '.data[].id'"] },
+      { kind: "h2", text: "Chat completion" },
+      {
+        kind: "code",
+        lines: [
+          "curl https://llm.unsigned.gg/v1/chat/completions \\",
+          "  -H \"Authorization: Bearer $LLM_KEY\" -H 'Content-Type: application/json' \\",
+          "  -d '{\"model\":\"claude-sonnet-5\",\"messages\":[{\"role\":\"user\",\"content\":\"ping\"}]}'",
+        ],
+      },
+      { kind: "callout", tone: "warn", text: "It's OpenAI-compatible, so point any SDK at the base URL with your key as the API key. Key management (minting, budgets) is admin-only and not exposed publicly." },
+    ],
+  },
+
   // ── a. access-walkthrough ──────────────────────────────────────────────────
   {
     slug: "access-walkthrough",

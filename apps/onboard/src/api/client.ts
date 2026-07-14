@@ -1,5 +1,6 @@
 import { getAccessToken, userManager } from "../auth/oidc";
 import { appPath } from "../base";
+import type { Guide } from "../guides/content";
 
 // Cross-origin API host (the Go API stays in paas behind
 // onboard.dev.unsigned.gg/api; CORS for https://unsigned.gg comes from the
@@ -74,6 +75,14 @@ export interface OperatorUserDetail {
   evidence: EvidenceItem[];
 }
 
+// Signed-in reference guides — the real-detail layer the public bundle
+// can't carry (served by onboard-api, same Guide shape as bundled content).
+export interface GuideMeta {
+  slug: string;
+  title: string;
+  purpose: string;
+}
+
 export interface Me {
   id: string;
   email: string;
@@ -82,6 +91,13 @@ export interface Me {
   tailscaleLogin: string;
   tenantSlug: string;
   isOperator: boolean;
+}
+
+// ApiError carries the HTTP status so callers can distinguish a 404 (e.g. the
+// guides endpoint not deployed yet, or an unknown slug) from a real failure
+// without string-matching the server's error text.
+export interface ApiError extends Error {
+  status?: number;
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
@@ -104,7 +120,9 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   }
   if (!res.ok) {
     const body = await res.json().catch(() => ({ error: res.statusText }));
-    throw new Error(body.error ?? `HTTP ${res.status}`);
+    const err = new Error(body.error ?? `HTTP ${res.status}`) as ApiError;
+    err.status = res.status;
+    throw err;
   }
   return res.json() as Promise<T>;
 }
@@ -120,6 +138,8 @@ export const api = {
   challenge: (slug: string) =>
     request<{ nonce: string; expiresAt: string; command: string }>(
       `/api/v1/steps/${slug}/challenge`, { method: "POST" }),
+  guides: () => request<{ guides: GuideMeta[] }>("/api/v1/guides"),
+  guide: (slug: string) => request<Guide>(`/api/v1/guides/${slug}`),
   module: (slug: string) => request<ModuleBank>(`/api/v1/modules/${slug}`),
   attempt: (slug: string, answers: Record<string, number>) =>
     request<GradeResult>(`/api/v1/modules/${slug}/attempts`, {
