@@ -70,7 +70,7 @@ export const GUIDES: Guide[] = [
       { kind: "p", text: "You get a personal, budgeted key for the LLM gateway. Confirm it works, then use any model in the catalog. See the llm-gateway guide." },
       { kind: "code", lines: ["curl https://llm.unsigned.gg/v1/models -H \"Authorization: Bearer $LLM_KEY\""] },
       { kind: "h2", text: "6. First clone from the forge" },
-      { kind: "p", text: "Clone from the canonical Forgejo at `git.cerebral.work` (GitHub is mirror-only). The tailnet policy repo is a good first read — it's the file that grants your own access." },
+      { kind: "p", text: "Clone from the canonical self-hosted Forgejo (GitHub is mirror-only); the exact host is in the signed-in Reference. The tailnet policy repo is a good first read — it's the file that grants your own access." },
       { kind: "h2", text: "7. Prove access — the closer", id: "proof" },
       { kind: "p", text: "Mint the `access-kubeconfig` challenge on your board and run the printed command — it writes a ConfigMap `onboard-proof-<nonce>` in YOUR `tenant-<you>` namespace. That single artifact proves a working kubeconfig AND your tenant RBAC; the platform marks you verified when it lands." },
       { kind: "callout", tone: "info", text: "You're wired in when the proof ConfigMap exists. Good first pickup: the ArgoCD application tree — that's where the cluster's declarative state lives." },

@@ -93,6 +93,13 @@ export interface Me {
   isOperator: boolean;
 }
 
+// ApiError carries the HTTP status so callers can distinguish a 404 (e.g. the
+// guides endpoint not deployed yet, or an unknown slug) from a real failure
+// without string-matching the server's error text.
+export interface ApiError extends Error {
+  status?: number;
+}
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const token = await getAccessToken();
   if (!token) {
@@ -113,7 +120,9 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   }
   if (!res.ok) {
     const body = await res.json().catch(() => ({ error: res.statusText }));
-    throw new Error(body.error ?? `HTTP ${res.status}`);
+    const err = new Error(body.error ?? `HTTP ${res.status}`) as ApiError;
+    err.status = res.status;
+    throw err;
   }
   return res.json() as Promise<T>;
 }

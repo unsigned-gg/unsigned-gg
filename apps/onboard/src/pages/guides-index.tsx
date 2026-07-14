@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { api, type GuideMeta } from "../api/client";
+import { api, type ApiError, type GuideMeta } from "../api/client";
 import { GUIDES } from "../guides/content";
 
 function GuideList({ guides }: { guides: { slug: string; title: string; purpose: string }[] }) {
@@ -30,13 +30,27 @@ export default function GuidesIndex() {
   // The signed-in reference is served by onboard-api, never bundled — the
   // bundle is public, so real hostnames and IPs only exist behind auth.
   const [internal, setInternal] = useState<GuideMeta[] | null>(null);
-  const [internalErr, setInternalErr] = useState<string | null>(null);
+  // "loading" until resolved; "absent" when the endpoint isn't deployed yet
+  // (404 during the rollout window — not an error worth alarming users over);
+  // "error" only for genuine failures.
+  const [refState, setRefState] = useState<"loading" | "ready" | "absent" | "error">("loading");
 
   useEffect(() => {
+    let ignore = false;
     api
       .guides()
-      .then((r) => setInternal(r.guides))
-      .catch((e: Error) => setInternalErr(e.message));
+      .then((r) => {
+        if (ignore) return;
+        setInternal(r.guides);
+        setRefState("ready");
+      })
+      .catch((e: ApiError) => {
+        if (ignore) return;
+        setRefState(e.status === 404 ? "absent" : "error");
+      });
+    return () => {
+      ignore = true;
+    };
   }, []);
 
   return (
@@ -54,16 +68,23 @@ export default function GuidesIndex() {
         The real values — hostnames, the apiserver VIP, who to ping. Served to
         your session only; none of it ships in this page&apos;s public bundle.
       </p>
-      {internal === null && internalErr === null && (
+      {refState === "loading" && (
         <p className="mt-4 font-mono text-xs text-dim">loading…</p>
       )}
-      {internalErr && (
-        <p className="mt-4 font-mono text-xs text-bad">
-          reference unavailable: {internalErr}
+      {refState === "absent" && (
+        <p className="mt-4 font-mono text-xs text-dim">
+          not available yet — sign-in reference is served once onboard-api is deployed.
         </p>
       )}
-      {internal && internal.length > 0 && <GuideList guides={internal} />}
-      {internal && internal.length === 0 && (
+      {refState === "error" && (
+        <p className="mt-4 font-mono text-xs text-bad">
+          couldn&apos;t load the signed-in reference — try reloading.
+        </p>
+      )}
+      {refState === "ready" && internal && internal.length > 0 && (
+        <GuideList guides={internal} />
+      )}
+      {refState === "ready" && internal && internal.length === 0 && (
         <p className="mt-4 font-mono text-xs text-dim">nothing published yet.</p>
       )}
 
