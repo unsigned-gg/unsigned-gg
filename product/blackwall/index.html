@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>unsigned/product/blackwall</title>
+  <meta name="description" content="blackwall — the containment layer for AI agent execution. Syscall jail, content-addressed run custody, typed settle. The agent never touches your tree." />
+  <meta name="theme-color" content="#0a0a0a" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%230a0a0a'/><text x='16' y='22' font-family='monospace' font-size='16' fill='%2300e599' text-anchor='middle'>0x</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/tokens.css" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <a href="#main" class="skip">skip to content</a>
+
+  <header class="top">
+    <div class="logo"><a href="/">unsigned<b>.gg</b></a><span>/product/blackwall</span></div>
+    <div class="top-right">
+      <button class="kbd-hint" aria-label="open command bar"><kbd>⌘</kbd><kbd>K</kbd> jump</button>
+    </div>
+  </header>
+
+  <main id="main" tabindex="-1">
+
+    <section class="intro">
+      <p class="eyebrow">unsigned platform · agent containment</p>
+      <h1>The agent never touches your tree.</h1>
+      <p class="lede">blackwall is the containment layer for AI agent execution. An agent runs
+        inside an OS syscall jail; its output lands as a content-addressed custody record;
+        nothing reaches your code until you settle it. One static Rust binary.</p>
+    </section>
+
+    <section id="problem" aria-labelledby="problem-h">
+      <h2 id="problem-h">The problem</h2>
+      <p>An agent with write access is an unreviewed committer. It edits the working tree in
+        place, mixes its changes with yours, and leaves you diffing your repository against
+        your memory. Scale that to a fleet and the question stops being <em>is the code good</em>
+        and becomes <em>what actually happened</em>.</p>
+      <p>blackwall answers the second question first. Execution is evidence before it is code.</p>
+    </section>
+
+    <section id="custody" aria-labelledby="custody-h">
+      <h2 id="custody-h">Custody, not trust</h2>
+      <p class="section-lede">Three invariants. Each one is enforced by a mechanism, not a convention.</p>
+      <div class="invariants">
+        <article>
+          <h3><span class="idx" aria-hidden="true">jail</span>Confinement</h3>
+          <p>Landlock syscall confinement, native to the kernel. The agent works in a scratch
+            materialization of your world — it never sees the real tree's path. Where the
+            kernel can't enforce it, the run fails closed.</p>
+        </article>
+        <article>
+          <h3><span class="idx" aria-hidden="true">store</span>Identity</h3>
+          <p>Every run is captured whole — prompt, model, output, exit, usage — and addressed
+            by the BLAKE3 hash of its content. The hash is the identity: the same run is the
+            same object, and a tampered record is a different hash.</p>
+        </article>
+        <article>
+          <h3><span class="idx" aria-hidden="true">settle</span>Decision</h3>
+          <p>Output advances only through a typed state machine —
+            <code>select</code> · <code>release</code> · <code>apply</code> · <code>discard</code>.
+            A settled run is a moved value. Re-settling is a compile error, not a runtime check.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="pipeline" aria-labelledby="pipeline-h">
+      <h2 id="pipeline-h">One run, end to end</h2>
+      <p class="section-lede">Step through it. Every stage leaves an object in the store; the chain is replayable from any of them.</p>
+      <div class="stepper" data-stepper>
+        <div class="steps" role="tablist" aria-label="run pipeline stages"></div>
+        <div class="step-detail" role="tabpanel" aria-live="polite">
+          <h3 data-step-title></h3>
+          <p data-step-body></p>
+        </div>
+      </div>
+      <p class="pipeline-note">The provider seam is model-agnostic — any OpenAI-compatible
+        gateway, the claude CLI, or the omp harness. Containment does not depend on which
+        model is inside it.</p>
+    </section>
+
+    <section id="telemetry" aria-labelledby="telemetry-h">
+      <h2 id="telemetry-h">Every run answers for itself</h2>
+      <p>The trace ID <em>is</em> the run hash — the same hex identifies the custody object,
+        the distributed trace, and the pull request it became. Traces, logs, and metrics
+        ship over OTLP. The harness session file is captured inside the run's own directory,
+        bound by a correlation id minted before the model says a word — the mapping between
+        a run and everything it did is structural, not reported.</p>
+    </section>
+
+    <aside id="lineage" aria-labelledby="lineage-h">
+      <h2 id="lineage-h">Lineage</h2>
+      <p>A ground-up Rust reimplementation of the shepherd execution model — not a fork, not
+        a port. Reimplemented to surpass: provider-agnostic where the original is
+        single-model, one static binary where it is a Python runtime, kernel-native
+        confinement where it shims through FFI, typed custody where it checks at runtime.</p>
+    </aside>
+
+    <section id="surface" aria-labelledby="surface-h">
+      <h2 id="surface-h">Surface</h2>
+      <div class="surface-cols">
+        <div>
+          <h3 class="col-label shipped">shipped</h3>
+          <ul class="feat">
+            <li>Custody core — records, changesets, worlds (DAG), typed settle</li>
+            <li>Multi-provider execution behind one seam</li>
+            <li>Task library, batch orchestration, prompt templating</li>
+            <li>Reconcile → PR → merge gate, from a settled run</li>
+            <li>Token budgets and per-run cost tracking</li>
+            <li>Operation traces — one delta per tool call, stable ids</li>
+            <li>OTel traces, logs, metrics — trace id = run hash</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="col-label building">in flight</h3>
+          <ul class="feat">
+            <li>Live run streaming — event bus, inline tail, escalation hooks</li>
+            <li><code>blackwall serve</code> — dispatch queue, DAG plans, REST + MCP surface</li>
+            <li>Delta lineage — conversation↔code links, mid-run branch points</li>
+            <li>Cluster execution — one-shot jobs on the platform's build pattern</li>
+          </ul>
+        </div>
+      </div>
+      <p class="whyfor">Built for operators who run agents in fleets and answer for the
+        result. If you need to know what an agent did, prove it, and undo it — that is
+        custody, and it is the whole product.</p>
+    </section>
+
+    <section id="anatomy" aria-labelledby="anatomy-h">
+      <h2 id="anatomy-h">Anatomy</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th scope="col">crate</th><th scope="col">role</th></tr></thead>
+          <tbody>
+            <tr><td><code>blackwall-core</code></td><td>settle state machine + world propagation</td></tr>
+            <tr><td><code>blackwall-store</code></td><td>content-addressed store: records, changesets, worlds, blobs, pure-Rust git ODB</td></tr>
+            <tr><td><code>blackwall-jail</code></td><td>Landlock confinement — fails closed without kernel support</td></tr>
+            <tr><td><code>blackwall-provider</code></td><td>the executor seam: gateway / claude / omp / static</td></tr>
+            <tr><td><code>blackwall-cli</code></td><td>the <code>blackwall</code> binary — 20+ verbs over the above</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="meta-row"><span>286 tests</span><span>clippy clean, warnings deny</span><span>3 providers verified end-to-end</span><span>static musl, distroless, nonroot</span></p>
+    </section>
+
+    <footer class="foot">
+      <span>unsigned // blackwall — custody for agent execution</span>
+      <span class="bit">// the sign bit stays with you</span>
+    </footer>
+  </main>
+
+  <div class="palette-wrap" role="dialog" aria-modal="true" aria-label="command bar" hidden>
+    <div class="scrim"></div>
+    <div class="palette">
+      <input type="text" placeholder="jump to a section…" aria-label="command bar input"
+             role="combobox" aria-expanded="true" aria-controls="cmd-list" spellcheck="false" autocomplete="off" />
+      <ul id="cmd-list" role="listbox"></ul>
+    </div>
+  </div>
+
+  <noscript><div class="nojs"><p>The pipeline stepper needs JavaScript; everything else on this page reads fine without it.</p></div></noscript>
+
+  <script src="app.js"></script>
+</body>
+</html>
