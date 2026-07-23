@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>unsigned // product</title>
+  <meta name="description" content="Products from unsigned — agent containment, observability, and platform tooling." />
+  <meta name="theme-color" content="#0a0a0a" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/tokens.css" />
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{background:#0a0a0a;color:#c8c8c8;font-family:Inter,sans-serif;line-height:1.6;max-width:840px;margin:0 auto;padding:2rem 1.5rem}
+    a{color:#00e599;text-decoration:none}
+    a:hover{text-decoration:underline}
+    .top{border-bottom:1px solid #222;padding-bottom:1rem;margin-bottom:2rem;display:flex;justify-content:space-between;align-items:center}
+    .top a{font-family:JetBrains Mono,monospace;font-weight:500}
+    .top .path{color:#555;font-family:JetBrains Mono,monospace;font-size:0.9rem}
+    .eyebrow{color:#00e599;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.15em;margin-bottom:0.5rem}
+    h1{font-size:2rem;font-weight:300;letter-spacing:-0.02em;margin-bottom:0.5rem}
+    .lede{color:#999;font-size:1.1rem;font-weight:300;margin-bottom:2rem}
+    .grid{display:grid;gap:1rem;grid-template-columns:1fr}
+    @media(min-width:640px){.grid{grid-template-columns:1fr 1fr}}
+    .card{border:1px solid #1a1a1a;border-radius:8px;padding:1.5rem;transition:border-color 0.2s}
+    .card:hover{border-color:#00e599;text-decoration:none}
+    .card h2{font-size:1.2rem;font-weight:500;margin-bottom:0.4rem;text-decoration:none}
+    .card p{color:#888;font-size:0.95rem;text-decoration:none}
+    .card .tag{display:inline-block;font-family:JetBrains Mono,monospace;font-size:0.7rem;color:#00e599;border:1px solid #00e59933;border-radius:4px;padding:0.1rem 0.4rem;margin-bottom:0.6rem}
+    footer{margin-top:3rem;padding-top:1rem;border-top:1px solid #222;color:#555;font-size:0.8rem;font-family:JetBrains Mono,monospace}
+  </style>
+</head>
+<body>
+
+  <header class="top">
+    <a href="/">unsigned<b>.gg</b></a>
+    <span class="path">/product</span>
+  </header>
+
+  <main>
+    <p class="eyebrow">unsigned platform · products</p>
+    <h1>What we're building.</h1>
+    <p class="lede">Tools for operators who run AI agents in fleets and answer for the result. Containment, observability, and the data to prove what happened.</p>
+
+    <div class="grid">
+      <a class="card" href="/product/blackwall">
+        <span class="tag">v1.0.0</span>
+        <h2>blackwall</h2>
+        <p>AI-containment custody layer. Runs agents inside a Landlock syscall jail, captures output as content-addressed records, and settles every change behind an explicit decision. k8s orchestration, OTLP telemetry, training corpus export. Nothing lands until you settle it.</p>
+      </a>
+
+      <a class="card" href="/product/overflow">
+        <span class="tag">alpha</span>
+        <h2>overflow</h2>
+        <p>Observability surface for agent fleets. Consumes blackwall's REST API and Langfuse data lake to visualize dispatch queues, run custody lineage, and settle-state transitions in real time. The operator's pane for the custody chain.</p>
+      </a>
+    </div>
+  </main>
+
+  <footer>
+    <span>unsigned // product — what we're building</span>
+    <span style="float:right">// the sign bit stays with you</span>
+  </footer>
+
+</body>
+</html>
