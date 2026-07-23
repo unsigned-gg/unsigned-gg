@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>blackwall · unsigned // agent containment custody layer</title>
+  <meta name="description" content="blackwall — the containment layer for AI agent execution. Syscall jail, content-addressed run custody, typed settle. The agent never touches your tree. v1.0.0 with k8s orchestration, telemetry, and training data pipeline." />
+  <meta name="theme-color" content="#0a0a0a" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%230a0a0a'/><text x='16' y='22' font-family='monospace' font-size='16' fill='%2300e599' text-anchor='middle'>0x</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+<body style="background:#0a0a0a;color:#c8c8c8;font-family:Inter,sans-serif;max-width:840px;margin:0 auto;padding:2rem 1.5rem;line-height:1.6">
+  <header style="border-bottom:1px solid #222;padding-bottom:1rem;margin-bottom:2rem">
+    <a href="/" style="color:#00e599;text-decoration:none;font-family:JetBrains Mono,monospace;font-weight:500">unsigned<b>.gg</b></a>
+    <span style="color:#555;font-family:JetBrains Mono,monospace;font-size:0.9rem">/product/blackwall</span>
+  </header>
+  <main>
+    <p style="color:#00e599;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.1em;margin:0">unsigned platform · agent containment · v1.0.0</p>
+    <h1 style="font-size:2.5rem;font-weight:300;letter-spacing:-0.02em;margin:0.5rem 0">The agent never touches your tree.</h1>
+    <p style="font-size:1.15rem;color:#999;font-weight:300;max-width:620px">
+      blackwall is the containment layer for AI agent execution. An agent runs inside an OS
+      syscall jail; its output lands as a content-addressed custody record; nothing reaches
+      your code until you settle it. One static Rust binary. 506 tests. Zero warnings.
+    </p>
+
+    <section style="margin-top:3rem">
+      <h2 style="color:#00e599;font-size:1.3rem;border-bottom:1px solid #222;padding-bottom:0.5rem">v1.0.0 shipped</h2>
+      <ul style="list-style:none;padding:0">
+        <li style="padding:0.5rem 0;border-bottom:1px solid #1a1a1a"><strong style="color:#e0e0e0">Custody core</strong> — records, changesets, worlds (DAG), typed settle, atomic-write, pure-Rust git ODB</li>
+        <li style="padding:0.5rem 0;border-bottom:1px solid #1a1a1a"><strong style="color:#e0e0e0">Serve layer</strong> — axum REST API, JWT-SVID authz, MCP surface, multi-project isolation, JobExecutor (k8s Jobs)</li>
+        <li style="padding:0.5rem 0;border-bottom:1px solid #1a1a1a"><strong style="color:#e0e0e0">Streaming</strong> — RunEvent bus, events.ndjson, box renderer, escalation sink, harness bridge</li>
+        <li style="padding:0.5rem 0;border-bottom:1px solid #1a1a1a"><strong style="color:#e0e0e0">Telemetry</strong> — OTLP auto-fire (traces+logs+metrics), Langfuse ingestion, training corpus export</li>
+        <li style="padding:0.5rem 0;border-bottom:1px solid #1a1a1a"><strong style="color:#e0e0e0">Orchestration</strong> — dispatch queue, DAG plans v2, batch merge, mid-run branch points, CRDT overlap merge</li>
+        <li style="padding:0.5rem 0;border-bottom:1px solid #1a1a1a"><strong style="color:#e0e0e0">GitOps chain</strong> — reconcile → PR → merge-gate → watch daemon</li>
+        <li style="padding:0.5rem 0;border-bottom:1px solid #1a1a1a"><strong style="color:#e0e0e0">Training data</strong> — <code style="color:#00e599">run export-corpus --all</code> produces joinable JSONL. AgentHER relabeling mines failures into gold.</li>
+      </ul>
+    </section>
+
+    <section style="margin-top:3rem">
+      <h2 style="color:#00e599;font-size:1.3rem;border-bottom:1px solid #222;padding-bottom:0.5rem">Kubernetes orchestration</h2>
+      <p>Static distroless binary (UID 1000, all caps dropped, seccomp RuntimeDefault). Helm chart, ArgoCD Application, and a JobExecutor that dispatches runs as one-shot k8s Jobs. The Landlock jail is verified active on Talos/Cygnus — it's the real security boundary, not RBAC.</p>
+    </section>
+
+    <section style="margin-top:3rem">
+      <h2 style="color:#00e599;font-size:1.3rem;border-bottom:1px solid #222;padding-bottom:0.5rem">Architecture</h2>
+      <table style="width:100%;border-collapse:collapse;font-size:0.95rem">
+        <thead><tr><th style="text-align:left;padding:0.5rem;border-bottom:1px solid #222;color:#888">crate</th><th style="text-align:left;padding:0.5rem;border-bottom:1px solid #222;color:#888">role</th></tr></thead>
+        <tbody>
+          <tr><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a"><code style="color:#00e599">blackwall-core</code></td><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a">settle state machine + world propagation (zero-dep)</td></tr>
+          <tr><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a"><code style="color:#00e599">blackwall-store</code></td><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a">content-addressed store, git ODB, atomic-write</td></tr>
+          <tr><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a"><code style="color:#00e599">blackwall-jail</code></td><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a">Landlock syscall confinement, fine-grained access rules</td></tr>
+          <tr><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a"><code style="color:#00e599">blackwall-provider</code></td><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a">gateway / claude / omp + resolve_provider factory</td></tr>
+          <tr><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a"><code style="color:#00e599">blackwall-cli</code></td><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a">22 verbs, dispatch queue, OTel/Langfuse/corpus export, box renderer</td></tr>
+          <tr><td style="padding:0.5rem"><code style="color:#00e599">blackwall-serve</code></td><td style="padding:0.5rem">axum REST + MCP surface + JWT-SVID authz + event logging + JobExecutor</td></tr>
+        </tbody>
+      </table>
+      <p style="color:#666;font-size:0.85rem;margin-top:1rem">
+        506 tests · clippy clean, warnings deny · 3 providers verified · static musl, distroless, nonroot · v1.0.0
+      </p>
+    </section>
+
+    <section style="margin-top:3rem">
+      <h2 style="color:#00e599;font-size:1.3rem;border-bottom:1px solid #222;padding-bottom:0.5rem">Beyond v1.0.0</h2>
+      <p style="color:#777">Native A2A transport · Sigstore/in-toto signed receipts · Incremental stream parsing · Langfuse self-hosted on Cygnus · Overflow UI frontend · crates.io publish · Cross-cluster store addressing</p>
+    </section>
+
+    <footer style="margin-top:3rem;padding-top:1rem;border-top:1px solid #222;color:#555;font-size:0.85rem;font-family:JetBrains Mono,monospace">
+      <span>unsigned // blackwall — custody for agent execution</span>
+      <span style="float:right">// the sign bit stays with you</span>
+    </footer>
+  </main>
+</body>
+</html>
