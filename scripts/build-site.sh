@@ -24,6 +24,7 @@ done
 cp -r learn "$OUT/learn"
 cp -r roadmap "$OUT/roadmap"
 cp -r overflow "$OUT/overflow"
+cp -r product/blackwall "$OUT/product/blackwall"
 # Shared brand tokens at the site root (packages/tokens is the source of truth).
 cp packages/tokens/dist/tokens.css "$OUT/tokens.css"
 # Shared command-bar engine (packages/palette), same discipline.
