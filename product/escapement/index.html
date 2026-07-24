@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>escapement · unsigned // metered deterministic agent dispatch</title>
+  <meta name="description" content="escapement — the agent-orchestration engine for the unsigned constellation. Rust core + edge worker. Metered, deterministic dispatch for blackwall runs: one-shot jobs, DAG plan execution, and custody provenance through the dispatch lifecycle." />
+  <meta name="theme-color" content="#0a0a0a" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%230a0a0a'/><text x='16' y='22' font-family='monospace' font-size='16' fill='%2300e599' text-anchor='middle'>▸</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+<body style="background:#0a0a0a;color:#c8c8c8;font-family:Inter,sans-serif;max-width:840px;margin:0 auto;padding:2rem 1.5rem;line-height:1.6">
+  <header style="border-bottom:1px solid #222;padding-bottom:1rem;margin-bottom:2rem">
+    <a href="/" style="color:#00e599;text-decoration:none;font-family:JetBrains Mono,monospace;font-weight:500">unsigned<b>.gg</b></a>
+    <span style="color:#555;font-family:JetBrains Mono,monospace;font-size:0.9rem">/product/escapement</span>
+  </header>
+  <main>
+    <p style="color:#00e599;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.1em;margin:0">unsigned platform · agent orchestration · in development</p>
+    <h1 style="font-size:2.5rem;font-weight:300;letter-spacing:-0.02em;margin:0.5rem 0">Metered dispatch for the agent constellation.</h1>
+    <p style="font-size:1.15rem;color:#999;font-weight:300;max-width:620px">
+      escapement is the scheduling layer that dispatches blackwall runs as one-shot jobs,
+      manages DAG plan execution, and carries custody provenance through the entire dispatch
+      lifecycle. A Rust core for deterministic ordering, an edge worker for low-latency
+      admission. No agent fires until the escapement allows it.
+    </p>
+
+    <section style="margin-top:3rem">
+      <h2 style="color:#00e599;font-size:1.3rem;border-bottom:1px solid #222;padding-bottom:0.5rem">What it does</h2>
+      <ul style="list-style:none;padding:0">
+        <li style="padding:0.5rem 0;border-bottom:1px solid #1a1a1a"><strong style="color:#e0e0e0">One-shot dispatch</strong> — every blackwall run is a single metered job: admitted, executed, settled, reaped. No long-running agent processes holding state they can't prove.</li>
+        <li style="padding:0.5rem 0;border-bottom:1px solid #1a1a1a"><strong style="color:#e0e0e0">DAG plan execution</strong> — multi-step agent plans run as a directed acyclic graph. Dependencies resolved in topological order; each node inherits custody from its predecessors. Mid-run branch points and CRDT overlap merge keep parallel branches consistent.</li>
+        <li style="padding:0.5rem 0;border-bottom:1px solid #1a1a1a"><strong style="color:#e0e0e0">Custody provenance</strong> — the dispatch record carries the full chain: who requested the run, what plan node spawned it, which parent custody it descends from, where the output landed. Every job is auditable back to its origin.</li>
+        <li style="padding:0.5rem 0;border-bottom:1px solid #1a1a1a"><strong style="color:#e0e0e0">Metered admission</strong> — concurrency limits, rate quotas, priority lanes, and backpressure. The escapement is the choke point that keeps the constellation from overrunning its providers or its budget.</li>
+      </ul>
+    </section>
+
+    <section style="margin-top:3rem">
+      <h2 style="color:#00e599;font-size:1.3rem;border-bottom:1px solid #222;padding-bottom:0.5rem">Architecture</h2>
+      <p>Deterministic Rust core for plan resolution and custody state; a lightweight edge worker handles admission, queueing, and provider-side backpressure close to where runs actually fire. The two communicate over a typed dispatch protocol — no ambiguous job JSON crossing the wire.</p>
+      <table style="width:100%;border-collapse:collapse;font-size:0.95rem">
+        <thead><tr><th style="text-align:left;padding:0.5rem;border-bottom:1px solid #222;color:#888">component</th><th style="text-align:left;padding:0.5rem;border-bottom:1px solid #222;color:#888">role</th></tr></thead>
+        <tbody>
+          <tr><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a"><code style="color:#00e599">escapement-core</code></td><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a">DAG plan resolver, custody state machine, settle propagation (zero-dep)</td></tr>
+          <tr><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a"><code style="color:#00e599">escapement-edge</code></td><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a">admission, metering, provider backpressure, one-shot job lifecycle</td></tr>
+          <tr><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a"><code style="color:#00e599">dispatch-protocol</code></td><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a">typed wire format: plan nodes, custody refs, settle receipts</td></tr>
+          <tr><td style="padding:0.5rem"><code style="color:#00e599">blackwall-bridge</code></td><td style="padding:0.5rem">spawns runs into blackwall jail, receives content-addressed custody records back</td></tr>
+        </tbody>
+      </table>
+      <p style="color:#666;font-size:0.85rem;margin-top:1rem">
+        Rust core + edge worker · typed dispatch protocol · custody provenance end to end · deterministic ordering · in development
+      </p>
+    </section>
+
+    <section style="margin-top:3rem">
+      <h2 style="color:#00e599;font-size:1.3rem;border-bottom:1px solid #222;padding-bottom:0.5rem">Why "escapement"</h2>
+      <p style="color:#999">A mechanical escapement is the mechanism that meters a clock's energy into discrete, deterministic ticks — releasing one tooth at a time, never the whole gear train at once. The agent constellation runs the same way: the escapement admits one job per tick, in a known order, with the full custody chain attached. No free-wheeling. No lost beats.</p>
+    </section>
+
+    <section style="margin-top:3rem">
+      <h2 style="color:#00e599;font-size:1.3rem;border-bottom:1px solid #222;padding-bottom:0.5rem">Status</h2>
+      <p style="color:#777">In development. Core dispatch and DAG plan execution are wired against the blackwall v1.0.0 custody API; edge worker admission and metered backpressure are the active work surface. Custody provenance flows end to end but the typed dispatch protocol is still stabilizing before we freeze it.</p>
+    </section>
+
+    <footer style="margin-top:3rem;padding-top:1rem;border-top:1px solid #222;color:#555;font-size:0.85rem;font-family:JetBrains Mono,monospace">
+      <span>unsigned // escapement — metered deterministic dispatch</span>
+      <span style="float:right">// one tick at a time</span>
+    </footer>
+  </main>
+</body>
+</html>

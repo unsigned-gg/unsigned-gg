@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>k8s-audit · unsigned // kubernetes cluster audit dashboard</title>
+  <meta name="description" content="k8s-audit — a SvelteKit PWA dashboard for Kubernetes cluster state. Real-time view into the Cygnus production cluster and Lyra dev cluster: GitOps, networking, RBAC, policy, workloads, nodes." />
+  <meta name="theme-color" content="#0a0a0a" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%230a0a0a'/><text x='16' y='22' font-family='monospace' font-size='16' fill='%2300e599' text-anchor='middle'>k8</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+<body style="background:#0a0a0a;color:#c8c8c8;font-family:Inter,sans-serif;max-width:840px;margin:0 auto;padding:2rem 1.5rem;line-height:1.6">
+  <header style="border-bottom:1px solid #222;padding-bottom:1rem;margin-bottom:2rem">
+    <a href="/" style="color:#00e599;text-decoration:none;font-family:JetBrains Mono,monospace;font-weight:500">unsigned<b>.gg</b></a>
+    <span style="color:#555;font-family:JetBrains Mono,monospace;font-size:0.9rem">/product/k8s-audit</span>
+  </header>
+  <main>
+    <p style="color:#00e599;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.1em;margin:0">unsigned platform · cluster observability · v0.1.0</p>
+    <h1 style="font-size:2.5rem;font-weight:300;letter-spacing:-0.02em;margin:0.5rem 0">Every namespace, every binding, one pane.</h1>
+    <p style="font-size:1.15rem;color:#999;font-weight:300;max-width:620px">
+      k8s-audit is a SvelteKit PWA that turns a raw <code style="color:#00e599">cluster-audit.json</code>
+      snapshot into a navigable dashboard. Namespaces, workloads, RBAC findings, Kyverno policies,
+      IngressRoutes, ArgoCD apps, and the migration roadmap — all typed, filterable, and rendered
+      client-side. A real-time view into the Cygnus production cluster and the Lyra dev cluster.
+    </p>
+
+    <section style="margin-top:3rem">
+      <h2 style="color:#00e599;font-size:1.3rem;border-bottom:1px solid #222;padding-bottom:0.5rem">What it does</h2>
+      <ul style="list-style:none;padding:0">
+        <li style="padding:0.5rem 0;border-bottom:1px solid #1a1a1a"><strong style="color:#e0e0e0">Cluster identity</strong> — current context, API server, provider, k8s version, CNI, and the Lyra→Cygnus migration target (bare-metal Talos, Cilium eBPF, WireGuard mTLS)</li>
+        <li style="padding:0.5rem 0;border-bottom:1px solid #1a1a1a"><strong style="color:#e0e0e0">Namespaces</strong> — 46 namespaces classified by component (security, gitops, compute, networking, observability, data, ai, tenant, applications, system) with search + filter</li>
+        <li style="padding:0.5rem 0;border-bottom:1px solid #1a1a1a"><strong style="color:#e0e0e0">Workloads</strong> — 69 deployments, 21 StatefulSets, 7 DaemonSets; image, replica count, type, search across all three</li>
+        <li style="padding:0.5rem 0;border-bottom:1px solid #1a1a1a"><strong style="color:#e0e0e0">RBAC audit</strong> — 8 findings (1 CRITICAL, 2 HIGH, 3 MEDIUM, 2 LOW), ClusterRoleBindings, tenant RoleBindings, ResourceQuotas</li>
+        <li style="padding:0.5rem 0;border-bottom:1px solid #1a1a1a"><strong style="color:#e0e0e0">Policy</strong> — 5 Kyverno ValidatingPolicies (all Audit mode), readiness + scope</li>
+        <li style="padding:0.5rem 0;border-bottom:1px solid #1a1a1a"><strong style="color:#e0e0e0">Networking</strong> — 20 IngressRoutes with external hostnames, per-namespace grouping</li>
+        <li style="padding:0.5rem 0;border-bottom:1px solid #1a1a1a"><strong style="color:#e0e0e0">GitOps</strong> — 58 ArgoCD applications, destination namespace, search</li>
+        <li style="padding:0.5rem 0;border-bottom:1px solid #1a1a1a"><strong style="color:#e0e0e0">Roadmap</strong> — 4 migration phases (VKE → bare-metal Talos / Hetzner+Talos green) + 9 Linear tickets mapped to PRs</li>
+        <li style="padding:0.5rem 0"><strong style="color:#e0e0e0">Nodes</strong> — 4-worker pool (VKE, migrating to bare-metal Talos hoplite-class nodes), version, OS, runtime</li>
+      </ul>
+    </section>
+
+    <section style="margin-top:3rem">
+      <h2 style="color:#00e599;font-size:1.3rem;border-bottom:1px solid #222;padding-bottom:0.5rem">Architecture</h2>
+      <p>Svelte 5 in runes mode, fully typed TypeScript data model, Bun as package manager + dev server, and <code style="color:#00e599">adapter-static</code> for a prerendered static build — deployable to any static host (Cloudflare Pages, Vercel, or a bare <code style="color:#00e599">bun run scripts/serve.ts</code>). The audit JSON is the single source of truth; the dashboard is a pure render of it.</p>
+      <table style="width:100%;border-collapse:collapse;font-size:0.95rem">
+        <thead><tr><th style="text-align:left;padding:0.5rem;border-bottom:1px solid #222;color:#888">view</th><th style="text-align:left;padding:0.5rem;border-bottom:1px solid #222;color:#888">renders</th></tr></thead>
+        <tbody>
+          <tr><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a"><code style="color:#00e599">overview</code></td><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a">cluster stats, identity table, migration phase cards</td></tr>
+          <tr><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a"><code style="color:#00e599">namespaces</code></td><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a">46 namespaces, component badges + search</td></tr>
+          <tr><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a"><code style="color:#00e599">services</code></td><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a">deployments + statefulsets + daemonsets, image & replicas</td></tr>
+          <tr><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a"><code style="color:#00e599">rbac</code></td><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a">findings (severity-tagged), clusterrolebindings, tenant rolebindings, quotas</td></tr>
+          <tr><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a"><code style="color:#00e599">policies</code></td><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a">5 Kyverno ValidatingPolicies, ready/action/scope</td></tr>
+          <tr><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a"><code style="color:#00e599">networking</code></td><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a">20 IngressRoutes, external hosts</td></tr>
+          <tr><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a"><code style="color:#00e599">gitops</code></td><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a">58 ArgoCD apps, dest namespace, search</td></tr>
+          <tr><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a"><code style="color:#00e599">roadmap</code></td><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a">4 migration phases + 9 Linear tickets</td></tr>
+          <tr><td style="padding:0.5rem"><code style="color:#00e599">nodes</code></td><td style="padding:0.5rem">worker pool: name, status, age, version, IP, OS, runtime</td></tr>
+        </tbody>
+      </table>
+      <p style="color:#666;font-size:0.85rem;margin-top:1rem">
+        SvelteKit v2 · Svelte 5 runes · TypeScript · Bun · adapter-static · prerendered PWA · cluster-audit.json source of truth
+      </p>
+    </section>
+
+    <section style="margin-top:3rem">
+      <h2 style="color:#00e599;font-size:1.3rem;border-bottom:1px solid #222;padding-bottom:0.5rem">Status</h2>
+      <p style="color:#777">v0.1.0 — single-cluster snapshot view (unsigned-paas-dev / Lyra VKE). The migration to Cygnus (bare-metal Talos, Cilium, Longhorn, SPIRE workload identity) is captured in the roadmap view: Phase 0 done, Phase 1 in-progress, Phases 2–3 planned. Multi-cluster (Cygnus prod + Lyra dev side-by-side) is the next iteration.</p>
+    </section>
+
+    <footer style="margin-top:3rem;padding-top:1rem;border-top:1px solid #222;color:#555;font-size:0.85rem;font-family:JetBrains Mono,monospace">
+      <span>unsigned // k8s-audit — cluster state, one pane</span>
+      <span style="float:right">// if it's in the cluster, it's on the page</span>
+    </footer>
+  </main>
+</body>
+</html>

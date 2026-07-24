@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>reach · unsigned // AI-drivable containerized desktop sandbox</title>
+  <meta name="description" content="reach — an AI-drivable containerized desktop sandbox. A secure, isolated environment where AI agents operate a full desktop (browser, terminal, file system) without touching the host. Container-native, GPU-ready, session-ephemeral." />
+  <meta name="theme-color" content="#0a0a0a" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%230a0a0a'/><text x='16' y='22' font-family='monospace' font-size='16' fill='%2300e599' text-anchor='middle'>0x</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+<body style="background:#0a0a0a;color:#c8c8c8;font-family:Inter,sans-serif;max-width:840px;margin:0 auto;padding:2rem 1.5rem;line-height:1.6">
+  <header style="border-bottom:1px solid #222;padding-bottom:1rem;margin-bottom:2rem">
+    <a href="/" style="color:#00e599;text-decoration:none;font-family:JetBrains Mono,monospace;font-weight:500">unsigned<b>.gg</b></a>
+    <span style="color:#555;font-family:JetBrains Mono,monospace;font-size:0.9rem">/product/reach</span>
+  </header>
+  <main>
+    <p style="color:#00e599;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.1em;margin:0">unsigned platform · agent sandbox · pre-alpha</p>
+    <h1 style="font-size:2.5rem;font-weight:300;letter-spacing:-0.02em;margin:0.5rem 0">A full desktop the agent drives. The host never moves.</h1>
+    <p style="font-size:1.15rem;color:#999;font-weight:300;max-width:620px">
+      reach is an AI-drivable containerized desktop sandbox. An agent boots a complete
+      desktop — browser, terminal, file system — inside an isolated container, operates it
+      like a human would, and leaves nothing behind. GPU-ready, session-ephemeral, and
+      container-native from the kernel up. The host tree is never touched.
+    </p>
+
+    <section style="margin-top:3rem">
+      <h2 style="color:#00e599;font-size:1.3rem;border-bottom:1px solid #222;padding-bottom:0.5rem">What it does</h2>
+      <p>Most agent sandboxes give the model a shell and call it a day. reach gives it a <em style="color:#e0e0e0;font-style:normal">desktop</em>. A real display server, a pointer, a keyboard, a browser able to click and read, a terminal able to type and wait, and a file system it can read and write — all inside a container the agent controls end to end. Tasks that need a GUI (filling a form, navigating a dashboard, verifying a rendered page) stop being hacks. They become just another action the agent takes.</p>
+      <p>Every session starts from a clean image and ends as nothing. There is no persistent state to leak, no leftover process to orphan, no host path to escape into. When the agent is done, the container is gone — only the artifacts it chose to emit survive.</p>
+    </section>
+
+    <section style="margin-top:3rem">
+      <h2 style="color:#00e599;font-size:1.3rem;border-bottom:1px solid #222;padding-bottom:0.5rem">Architecture</h2>
+      <table style="width:100%;border-collapse:collapse;font-size:0.95rem">
+        <thead><tr><th style="text-align:left;padding:0.5rem;border-bottom:1px solid #222;color:#888">layer</th><th style="text-align:left;padding:0.5rem;border-bottom:1px solid #222;color:#888">role</th></tr></thead>
+        <tbody>
+          <tr><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a"><code style="color:#00e599">container</code></td><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a">OCI runtime, namespaced fs / net / pid, dropped caps, seccomp profile</td></tr>
+          <tr><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a"><code style="color:#00e599">display</code></td><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a">headless Wayland / VNC, virtual pointer + keyboard, frame capture</td></tr>
+          <tr><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a"><code style="color:#00e599">desktop</code></td><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a">browser, terminal, editor, file manager — the apps the agent drives</td></tr>
+          <tr><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a"><code style="color:#00e599">gpu</code></td><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a">NVIDIA container runtime passthrough, on-demand, shareable across sessions</td></tr>
+          <tr><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a"><code style="color:#00e599">control</code></td><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a">agent-facing API: click, type, scroll, screenshot, read-dom, run-cmd, ls, cat</td></tr>
+          <tr><td style="padding:0.5rem"><code style="color:#00e599">egress</code></td><td style="padding:0.5rem">artifact channel — pinned paths the agent emits out of the sandbox at settle</td></tr>
+        </tbody>
+      </table>
+      <p style="color:#666;font-size:0.85rem;margin-top:1rem">
+        session-ephemeral · image-pinned · gpu-ready (CUDA / Vulkan) · landlock + seccomp · zero host mounts by default
+      </p>
+    </section>
+
+    <section style="margin-top:3rem">
+      <h2 style="color:#00e599;font-size:1.3rem;border-bottom:1px solid #222;padding-bottom:0.5rem">Why a desktop, not a shell</h2>
+      <ul style="list-style:none;padding:0">
+        <li style="padding:0.5rem 0;border-bottom:1px solid #1a1a1a"><strong style="color:#e0e0e0">See what the user sees</strong> — the agent gets frame captures and DOM reads, not just stdout. It can verify a button actually rendered before it clicks.</li>
+        <li style="padding:0.5rem 0;border-bottom:1px solid #1a1a1a"><strong style="color:#e0e0e0">Drive real apps</strong> — browsers, IDEs, internal tools with no API. If a human can do the task on screen, the agent can do it in reach.</li>
+        <li style="padding:0.5rem 0;border-bottom:1px solid #1a1a1a"><strong style="color:#e0e0e0">Isolate, don't emulate</strong> — it's a real container running real binaries, not a JS sandbox. CVEs and odd behaviors are the same ones production hits, not a mock's.</li>
+        <li style="padding:0.5rem 0;border-bottom:1px solid #1a1a1a"><strong style="color:#e0e0e0">GPU when needed</strong> — model inference, rendering, video. Pass a GPU through to the container for one session; reclaim it when the session ends.</li>
+        <li style="padding:0.5rem 0"><strong style="color:#e0e0e0">Throw the room away</strong> — session-ephemeral means each run is a clean image. No state drift, no "what did the last agent leave running," no forensic cleanup.</li>
+      </ul>
+    </section>
+
+    <section style="margin-top:3rem">
+      <h2 style="color:#00e599;font-size:1.3rem;border-bottom:1px solid #222;padding-bottom:0.5rem">Status</h2>
+      <p>Pre-alpha. The container + display + control layers are wired and a single agent can drive a browser through a real task. GPU passthrough works on a single node; multi-session scheduling is the active front. The host-tree invariant — <em style="color:#e0e0e0;font-style:normal">nothing escapes the container unless the agent explicitly emits it</em> — holds by construction and is the property reach will never trade away.</p>
+    </section>
+
+    <section style="margin-top:3rem">
+      <h2 style="color:#00e599;font-size:1.3rem;border-bottom:1px solid #222;padding-bottom:0.5rem">Roadmap</h2>
+      <p style="color:#777">Multi-session GPU scheduler · streamed frame capture with sub-200ms latency · signed artifact egress (reach → blackwall custody) · pinned OCI images per project · browser auto-profile with cookie / login isolation · MCP control surface for blackwall-dispatched runs</p>
+    </section>
+
+    <footer style="margin-top:3rem;padding-top:1rem;border-top:1px solid #222;color:#555;font-size:0.85rem;font-family:JetBrains Mono,monospace">
+      <span>unsigned // reach — a desktop the agent drives</span>
+      <span style="float:right">// the host never moves</span>
+    </footer>
+  </main>
+</body>
+</html>

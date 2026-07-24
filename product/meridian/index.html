@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>meridian · unsigned // fleet cockpit for multi-session agents</title>
+  <meta name="description" content="meridian — the read-first cockpit for a multi-session agent fleet. Session health, token spend, tool-call traces, and settle-state visibility across every running Claude/OMP session. The operator's command center for agent fleets." />
+  <meta name="theme-color" content="#0a0a0a" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%230a0a0a'/><text x='16' y='22' font-family='monospace' font-size='16' fill='%2300e599' text-anchor='middle'> mDataStream</text></svg>" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="meridian — fleet cockpit for multi-session agents" />
+  <meta property="og:description" content="The read-first cockpit for a multi-session agent fleet. Session health, token spend, tool-call traces, settle-state visibility. The command center for agent fleet operators." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+<body style="background:#0a0a0a;color:#c8c8c8;font-family:Inter,sans-serif;max-width:840px;margin:0 auto;padding:2rem 1.5rem;line-height:1.6">
+  <header style="border-bottom:1px solid #222;padding-bottom:1rem;margin-bottom:2rem">
+    <a href="/" style="color:#00e599;text-decoration:none;font-family:JetBrains Mono,monospace;font-weight:500">unsigned<b>.gg</b></a>
+    <span style="color:#555;font-family:JetBrains Mono,monospace;font-size:0.9rem">/product/meridian</span>
+  </header>
+  <main>
+    <p style="color:#00e599;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.1em;margin:0">unsigned platform · fleet observability · internal</p>
+    <h1 style="font-size:2.5rem;font-weight:300;letter-spacing:-0.02em;margin:0.5rem 0">Every session, one pane of glass.</h1>
+    <p style="font-size:1.15rem;color:#999;font-weight:300;max-width:620px">
+      meridian is the read-first cockpit for a multi-session agent fleet. When six Claude and OMP
+      sessions run at once, meridian is the surface that shows them all &mdash; session health, token
+      spend, tool-call traces, and settle-state in a single live view. Internal, product-shaped, and
+      built for the operator who answers for the fleet.
+    </p>
+
+    <section style="margin-top:3rem">
+      <h2 style="color:#00e599;font-size:1.3rem;border-bottom:1px solid #222;padding-bottom:0.5rem">What it does</h2>
+      <ul style="list-style:none;padding:0">
+        <li style="padding:0.5rem 0;border-bottom:1px solid #1a1a1a"><strong style="color:#e0e0e0">Fleet-wide session view</strong> &mdash; every active Claude/OMP session in one list, sorted by health and age. Stalled, erroring, and long-running sessions rise to the top; you never hunt for the one that quietly stopped.</li>
+        <li style="padding:0.5rem 0;border-bottom:1px solid #1a1a1a"><strong style="color:#e0e0e0">Token spend, live</strong> &mdash; input/output/cached tokens per session and per fleet, with running cost against your model budget. Spot the session burning the day's quota before it burns through the night.</li>
+        <li style="padding:0.5rem 0;border-bottom:1px solid #1a1a1a"><strong style="color:#e0e0e0">Tool-call traces</strong> &mdash; every tool invocation in order: name, arguments, result, duration. The audit trail that tells you what an agent actually did, not what it claims it did.</li>
+        <li style="padding:0.5rem 0;border-bottom:1px solid #1a1a1a"><strong style="color:#e0e0e0">Settle-state visibility</strong> &mdash; pending, settled, and rolled-back changes per session, surfaced from blackwall custody. You see exactly which outputs have crossed the line into your tree and which are still held.</li>
+        <li style="padding:0.5rem 0"><strong style="color:#e0e0e0">Read-first by design</strong> &mdash; meridian observes. It will not dispatch, settle, or mutate a run from the cockpit; the agent layer keeps the only write path. The operator sees everything; the operator acts elsewhere.</li>
+      </ul>
+    </section>
+
+    <section style="margin-top:3rem">
+      <h2 style="color:#00e599;font-size:1.3rem;border-bottom:1px solid #222;padding-bottom:0.5rem">Architecture</h2>
+      <p>meridian is a thin read surface over the estate's existing data plane. It does not own state &mdash; it joins signals that blackwall, reverie, and the Langfuse lake already produce. No new write path, no new source of truth, no duplicate custody record.</p>
+      <table style="width:100%;border-collapse:collapse;font-size:0.95rem;margin-top:1rem">
+        <thead><tr><th style="text-align:left;padding:0.5rem;border-bottom:1px solid #222;color:#888">signal</th><th style="text-align:left;padding:0.5rem;border-bottom:1px solid #222;color:#888">source</th></tr></thead>
+        <tbody>
+          <tr><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a"><code style="color:#00e599">session roster &amp; health</code></td><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a">reverie mesh &mdash; coord peers, heartbeats, role registry</td></tr>
+          <tr><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a"><code style="color:#00e599">token spend &amp; tool traces</code></td><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a">Langfuse data lake + blackwall RunEvent bus</td></tr>
+          <tr><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a"><code style="color:#00e599">settle-state</code></td><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a">blackwall REST API &mdash; custody records, changesets, typed settle</td></tr>
+          <tr><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a"><code style="color:#00e599">dispatch &amp; DAG lineage</code></td><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a">blackwall dispatch queue + events.ndjson stream</td></tr>
+          <tr><td style="padding:0.5rem"><code style="color:#00e599">operator auth</code></td><td style="padding:0.5rem">JWT-SVID, same identity plane as blackwall-serve</td></tr>
+        </tbody>
+      </table>
+      <p style="color:#666;font-size:0.85rem;margin-top:1rem">
+        Read-only by construction &middot; shares the blackwall authz plane &middot; no custody writes &middot; no dispatch &middot; internal access only
+      </p>
+    </section>
+
+    <section style="margin-top:3rem">
+      <h2 style="color:#00e599;font-size:1.3rem;border-bottom:1px solid #222;padding-bottom:0.5rem">Status</h2>
+      <ul style="list-style:none;padding:0">
+        <li style="padding:0.4rem 0;border-bottom:1px solid #1a1a1a"><span style="color:#00e599;font-family:JetBrains Mono,monospace;font-size:0.8rem">SHIPPED</span> &nbsp; live session roster + health aggregation across the reverie mesh</li>
+        <li style="padding:0.4rem 0;border-bottom:1px solid #1a1a1a"><span style="color:#00e599;font-family:JetBrains Mono,monospace;font-size:0.8rem">SHIPPED</span> &nbsp; per-session and fleet token-spend readout against model budget</li>
+        <li style="padding:0.4rem 0;border-bottom:1px solid #1a1a1a"><span style="color:#00e599;font-family:JetBrains Mono,monospace;font-size:0.8rem">SHIPPED</span> &nbsp; tool-call trace timeline from the RunEvent bus</li>
+        <li style="padding:0.4rem 0;border-bottom:1px solid #1a1a1a"><span style="color:#4d9fff;font-family:JetBrains Mono,monospace;font-size:0.8rem">ACTIVE</span> &nbsp; settle-state pane wiring into the blackwall REST surface</li>
+        <li style="padding:0.4rem 0"><span style="color:#999;font-family:JetBrains Mono,monospace;font-size:0.8rem">PLANNED</span> &nbsp; cost anomaly alerts, fleet-wide budget gates, multi-project views</li>
+      </ul>
+      <p style="color:#777;font-size:0.9rem;margin-top:1rem">Internal, product-shaped. Not a public SKU &mdash; the cockpit the unsigned operators use to run their own fleet, hardened into a real product because the operator's view should not be a scratch script.</p>
+    </section>
+
+    <section style="margin-top:3rem">
+      <h2 style="color:#00e599;font-size:1.3rem;border-bottom:1px solid #222;padding-bottom:0.5rem">Why it exists</h2>
+      <p style="color:#999">A fleet of autonomous agents is only as trustworthy as the operator's ability to see it. Run two sessions and you can watch them by hand. Run twelve, across providers and projects, and the gap between &ldquo;what the agent said it did&rdquo; and &ldquo;what actually landed&rdquo; becomes where the incident lives. meridian closes that gap: one read-first surface that shows every session's health, spend, traces, and settle-state, so the operator never answers for a fleet they could not see.</p>
+    </section>
+
+    <footer style="margin-top:3rem;padding-top:1rem;border-top:1px solid #222;color:#555;font-size:0.85rem;font-family:JetBrains Mono,monospace">
+      <span>unsigned // meridian &mdash; cockpit for the agent fleet</span>
+      <span style="float:right">// the sign bit stays with you</span>
+    </footer>
+  </main>
+</body>
+</html>
