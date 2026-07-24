@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>reverie · unsigned // memory consolidation daemon for LLM coding harnesses</title>
+  <meta name="description" content="reverie — neuroscience-grounded memory consolidation daemon for LLM coding harnesses. Go binary, SQLite + FTS5, MCP server, HTTP API on 127.0.0.1:7437, CLI, and TUI. The sole cross-harness memory of record for the estate." />
+  <meta name="theme-color" content="#0a0a0a" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%230a0a0a'/><text x='16' y='22' font-family='monospace' font-size='16' fill='%2300e599' text-anchor='middle'>0x</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+<body style="background:#0a0a0a;color:#c8c8c8;font-family:Inter,sans-serif;max-width:840px;margin:0 auto;padding:2rem 1.5rem;line-height:1.6">
+  <header style="border-bottom:1px solid #222;padding-bottom:1rem;margin-bottom:2rem">
+    <a href="/" style="color:#00e599;text-decoration:none;font-family:JetBrains Mono,monospace;font-weight:500">unsigned<b>.gg</b></a>
+    <span style="color:#555;font-family:JetBrains Mono,monospace;font-size:0.9rem">/product/reverie</span>
+  </header>
+  <main>
+    <p style="color:#00e599;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.1em;margin:0">estate memory · cross-harness · in production</p>
+    <h1 style="font-size:2.5rem;font-weight:300;letter-spacing:-0.02em;margin:0.5rem 0">The memory that doesn't forget between sessions.</h1>
+    <p style="font-size:1.15rem;color:#999;font-weight:300;max-width:620px">
+      reverie is the neuroscience-grounded memory consolidation daemon for LLM coding
+      harnesses. One Go binary serves MCP, HTTP on 127.0.0.1:7437, a CLI, and a TUI
+      against a single SQLite + FTS5 store. It is the sole cross-harness memory of
+      record for the estate — search observations, capture sessions, assemble context.
+    </p>
+
+    <section style="margin-top:3rem">
+      <h2 style="color:#00e599;font-size:1.3rem;border-bottom:1px solid #222;padding-bottom:0.5rem">What it does</h2>
+      <ul style="list-style:none;padding:0">
+        <li style="padding:0.5rem 0;border-bottom:1px solid #1a1a1a"><strong style="color:#e0e0e0">Observations</strong> — typed entries (decision, bug fix, discovery, convention) stored with <code style="color:#00e599">topic_key</code> paths for hierarchical browse</li>
+        <li style="padding:0.5rem 0;border-bottom:1px solid #1a1a1a"><strong style="color:#e0e0e0">Full-text search</strong> — FTS5 over saved observations; partial, exact, and fuzzy match modes</li>
+        <li style="padding:0.5rem 0;border-bottom:1px solid #1a1a1a"><strong style="color:#e0e0e0">Sessions</strong> — start, summarize, end; each harness session captured with prompts and key learnings</li>
+        <li style="padding:0.5rem 0;border-bottom:1px solid #1a1a1a"><strong style="color:#e0e0e0">Context assembly</strong> — <code style="color:#00e599">mem_context</code> returns a formatted markdown blob (sessions + observations + prompts) primed for the next turn</li>
+        <li style="padding:0.5rem 0;border-bottom:1px solid #1a1a1a"><strong style="color:#e0e0e0">Passive capture</strong> — <code style="color:#00e599">mem_capture_passive</code> parses <code style="color:#00e599">## Key Learnings</code> headers straight into observations</li>
+        <li style="padding:0.5rem 0;border-bottom:1px solid #1a1a1a"><strong style="color:#e0e0e0">Supersession</strong> — observations mark stale facts with a <code style="color:#00e599">supersedes:</code> field instead of deleting them</li>
+      </ul>
+    </section>
+
+    <section style="margin-top:3rem">
+      <h2 style="color:#00e599;font-size:1.3rem;border-bottom:1px solid #222;padding-bottom:0.5rem">Architecture</h2>
+      <table style="width:100%;border-collapse:collapse;font-size:0.95rem">
+        <thead><tr><th style="text-align:left;padding:0.5rem;border-bottom:1px solid #222;color:#888">surface</th><th style="text-align:left;padding:0.5rem;border-bottom:1px solid #222;color:#888">role</th></tr></thead>
+        <tbody>
+          <tr><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a"><code style="color:#00e599">reveried</code></td><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a">Go daemon binary (engram / engram-rs legacy name); systemd ExecStart at ~/.local/bin</td></tr>
+          <tr><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a"><code style="color:#00e599">SQLite + FTS5</code></td><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a">single-file store; observations, sessions, prompts, supersession graph</td></tr>
+          <tr><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a"><code style="color:#00e599">MCP server</code></td><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a">mcp__reverie_mem_* tools — the same memory surface exposed to every harness</td></tr>
+          <tr><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a"><code style="color:#00e599">HTTP API</code></td><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a">REST on 127.0.0.1:7437; /health, query, capture, session lifecycle</td></tr>
+          <tr><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a"><code style="color:#00e599">CLI</code></td><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a">search, save, list, tree, session start/end — scripting-friendly verbs</td></tr>
+          <tr><td style="padding:0.5rem"><code style="color:#00e599">TUI</code></td><td style="padding:0.5rem">terminal browse: mem_tree hierarchical counts, filtered list, full-bleed reader</td></tr>
+        </tbody>
+      </table>
+      <p style="color:#666;font-size:0.85rem;margin-top:1rem">
+        cross-harness memory of record · MCP + HTTP interfaces · passive extraction · supersession not deletion
+      </p>
+    </section>
+
+    <section style="margin-top:3rem">
+      <h2 style="color:#00e599;font-size:1.3rem;border-bottom:1px solid #222;padding-bottom:0.5rem">Status</h2>
+      <p style="color:#777">live in production across the estate. The <code style="color:#00e599">engram</code> and <code style="color:#00e599">reverie</code> MCP server names are aliases for the same backing daemon — both route to the shared memory. Drift-check runs at session start to flag stale observations; <code style="color:#00e599">mem_update</code> with a <code style="color:#00e599">supersedes:</code> field is the supported correction path. Next: streaming context windows, embedding-backed recall, and multi-project partition namespaces.</p>
+    </section>
+
+    <footer style="margin-top:3rem;padding-top:1rem;border-top:1px solid #222;color:#555;font-size:0.85rem;font-family:JetBrains Mono,monospace">
+      <span>unsigned // reverie — memory consolidation for LLM harnesses</span>
+      <span style="float:right">// the sign bit stays with you</span>
+    </footer>
+  </main>
+</body>
+</html>

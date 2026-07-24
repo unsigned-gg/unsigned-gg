@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>bench · unsigned // model benchmark dashboards</title>
+  <meta name="description" content="bench — model benchmark dashboards for bench.unsigned.gg. A local bank plus provenance-verified frontier leaderboard. SvelteKit PWA that tracks LLM performance across models with provenance metadata and reproducible benchmarks." />
+  <meta name="theme-color" content="#0a0a0a" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%230a0a0a'/><text x='16' y='22' font-family='monospace' font-size='14' fill='%2300e599' text-anchor='middle'>b.</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+<body style="background:#0a0a0a;color:#c8c8c8;font-family:Inter,sans-serif;max-width:840px;margin:0 auto;padding:2rem 1.5rem;line-height:1.6">
+  <header style="border-bottom:1px solid #222;padding-bottom:1rem;margin-bottom:2rem">
+    <a href="/" style="color:#00e599;text-decoration:none;font-family:JetBrains Mono,monospace;font-weight:500">unsigned<b>.gg</b></a>
+    <span style="color:#555;font-family:JetBrains Mono,monospace;font-size:0.9rem">/product/bench</span>
+  </header>
+  <main>
+    <p style="color:#00e599;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.1em;margin:0">unsigned platform · model evaluation · in development</p>
+    <h1 style="font-size:2.5rem;font-weight:300;letter-spacing:-0.02em;margin:0.5rem 0">Every score carries its receipts.</h1>
+    <p style="font-size:1.15rem;color:#999;font-weight:300;max-width:620px">
+      bench is the benchmark surface for LLM performance. A local bank of tasks lives next to a
+      provenance-verified frontier leaderboard: every rank is backed by the exact prompt, model
+      snapshot, runner, and environment that produced it. A SvelteKit PWA, installable and
+      offline-capable, that treats reproducibility as the unit of trust.
+    </p>
+
+    <section style="margin-top:3rem">
+      <h2 style="color:#00e599;font-size:1.3rem;border-bottom:1px solid #222;padding-bottom:0.5rem">What it does</h2>
+      <ul style="list-style:none;padding:0">
+        <li style="padding:0.5rem 0;border-bottom:1px solid #1a1a1a"><strong style="color:#e0e0e0">Local bank</strong> — a versioned task bank you own. Prompts, expected outputs, scoring rubrics, and tool fixtures are content-addressed, so a run today can be checked against a run from any prior commit.</li>
+        <li style="padding:0.5rem 0;border-bottom:1px solid #1a1a1a"><strong style="color:#e0e0e0">Frontier leaderboard</strong> — model rankings ordered by verified score. No anonymous submissions: every entry resolves to a provenance record signed against the bank revision it ran against.</li>
+        <li style="padding:0.5rem 0;border-bottom:1px solid #1a1a1a"><strong style="color:#e0e0e0">Provenance metadata</strong> — model id and snapshot digest, prompt template + variables, runner version, host class, environment hash, and timestamps are captured per run and surfaced inline with the score.</li>
+        <li style="padding:0.5rem 0;border-bottom:1px solid #1a1a1a"><strong style="color:#e0e0e0">Reproducible benchmarks</strong> — re-run a leaderboard entry from its provenance record. Drift between canonical and reproduced scores is shown as a delta, not hidden behind a single number.</li>
+        <li style="padding:0.5rem 0"><strong style="color:#e0e0e0">PWA install</strong> — SvelteKit service worker, manifest, and offline cache keep the leaderboard and bank readable without a connection. Runs queue and sync when the network returns.</li>
+      </ul>
+    </section>
+
+    <section style="margin-top:3rem">
+      <h2 style="color:#00e599;font-size:1.3rem;border-bottom:1px solid #222;padding-bottom:0.5rem">Architecture</h2>
+      <table style="width:100%;border-collapse:collapse;font-size:0.95rem">
+        <thead><tr><th style="text-align:left;padding:0.5rem;border-bottom:1px solid #222;color:#888">layer</th><th style="text-align:left;padding:0.5rem;border-bottom:1px solid #222;color:#888">role</th></tr></thead>
+        <tbody>
+          <tr><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a"><code style="color:#00e599">app</code></td><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a">SvelteKit PWA — leaderboard, bank browser, run detail, provenance drawer</td></tr>
+          <tr><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a"><code style="color:#00e599">bank</code></td><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a">content-addressed task bank: prompts, rubrics, fixtures, revisions</td></tr>
+          <tr><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a"><code style="color:#00e599">provenance</code></td><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a">per-run record: model snapshot, env hash, runner version, signed against bank rev</td></tr>
+          <tr><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a"><code style="color:#00e599">runner</code></td><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a">executes a bank revision against a model, emits score + provenance</td></tr>
+          <tr><td style="padding:0.5rem"><code style="color:#00e599">service worker</code></td><td style="padding:0.5rem">offline cache for leaderboard and bank; queued-run sync on reconnect</td></tr>
+        </tbody>
+      </table>
+      <p style="color:#666;font-size:0.85rem;margin-top:1rem">
+        SvelteKit · content-addressed bank · signed provenance records · reproducible runs · installable PWA · <code style="color:#00e599">bench.unsigned.gg</code>
+      </p>
+    </section>
+
+    <section style="margin-top:3rem">
+      <h2 style="color:#00e599;font-size:1.3rem;border-bottom:1px solid #222;padding-bottom:0.5rem">Status</h2>
+      <p>In development. The bank schema and provenance record format are stabilizing; the leaderboard and run-detail views are live against an internal dataset, with the public frontier board targeted next. Reproduction diffing and offline run queue land after the provenance pipeline is signed end-to-end.</p>
+    </section>
+
+    <footer style="margin-top:3rem;padding-top:1rem;border-top:1px solid #222;color:#555;font-size:0.85rem;font-family:JetBrains Mono,monospace">
+      <span>unsigned // bench — model benchmark dashboards</span>
+      <span style="float:right">// the sign bit stays with you</span>
+    </footer>
+  </main>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>mission-control · unsigned // live agent orchestration surface</title>
+  <meta name="description" content="mission-control — the live orchestration surface for unsigned agents. LLM gateway catalog, AgentHub Durable Object, real-time dispatch monitoring, gateway health, agent lifecycle visualization. Cloudflare Worker-based." />
+  <meta name="theme-color" content="#0a0a0a" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%230a0a0a'/><text x='16' y='22' font-family='monospace' font-size='14' fill='%2300e599' text-anchor='middle'>MC</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+<body style="background:#0a0a0a;color:#c8c8c8;font-family:Inter,sans-serif;max-width:840px;margin:0 auto;padding:2rem 1.5rem;line-height:1.6">
+  <header style="border-bottom:1px solid #222;padding-bottom:1rem;margin-bottom:2rem">
+    <a href="/" style="color:#00e599;text-decoration:none;font-family:JetBrains Mono,monospace;font-weight:500">unsigned<b>.gg</b></a>
+    <span style="color:#555;font-family:JetBrains Mono,monospace;font-size:0.9rem">/product/mission-control</span>
+  </header>
+  <main>
+    <p style="color:#00e599;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.1em;margin:0">unsigned platform · control surface · live</p>
+    <h1 style="font-size:2.5rem;font-weight:300;letter-spacing:-0.02em;margin:0.5rem 0">Every agent, one pane of glass.</h1>
+    <p style="font-size:1.15rem;color:#999;font-weight:300;max-width:620px">
+      mission-control is the live orchestration surface at mission-control.unsigned.gg. A Cloudflare
+      Worker fronts an AgentHub Durable Object; the dashboard watches dispatch, gateway health, and
+      agent lifecycle in real time. The catalog panel is your single map of every LLM gateway on the
+      estate — capacity, cost, latency, failover — at agent.unsigned.gg.
+    </p>
+
+    <section style="margin-top:3rem">
+      <h2 style="color:#00e599;font-size:1.3rem;border-bottom:1px solid #222;padding-bottom:0.5rem">What it does</h2>
+      <ul style="list-style:none;padding:0">
+        <li style="padding:0.5rem 0;border-bottom:1px solid #1a1a1a"><strong style="color:#e0e0e0">Real-time dispatch monitoring</strong> — every run, branch, and settle streamed live from the dispatch queue to the dashboard the second it lands.</li>
+        <li style="padding:0.5rem 0;border-bottom:1px solid #1a1a1a"><strong style="color:#e0e0e0">LLM gateway catalog</strong> — one panel for every gateway: model mix, tokens/min, $/Mtok, p95 latency, failover state. No more guessing which gateway to route to.</li>
+        <li style="padding:0.5rem 0;border-bottom:1px solid #1a1a1a"><strong style="color:#e0e0e0">AgentHub Durable Object</strong> — a single stateful edge object per workspace holding agent roster, assignment ledger, and heartbeat timeline. Survives Worker evictions, replays in order, never drops a beat.</li>
+        <li style="padding:0.5rem 0;border-bottom:1px solid #1a1a1a"><strong style="color:#e0e0e0">Gateway health</strong> — live probes fire on an interval; an unhealthy gateway is fenced off the routing table and surfaced red before the first request fails.</li>
+        <li style="padding:0.5rem 0;border-bottom:1px solid #1a1a1a"><strong style="color:#e0e0e0">Agent lifecycle visualization</strong> — spawn → idle → claimed → running → settling → done, rendered as a timeline you can scrub. Branches and escalations are first-class.</li>
+      </ul>
+    </section>
+
+    <section style="margin-top:3rem">
+      <h2 style="color:#00e599;font-size:1.3rem;border-bottom:1px solid #222;padding-bottom:0.5rem">Architecture</h2>
+      <p>A thin, globally-distributed edge app. The Worker is the public face — it terminates the dashboard, handles SSE/WebSocket fan-out, and validates the operator session. All durable state lives in the AgentHub Durable Object, so a Worker restart never loses in-flight assignments or the gateway catalog. Gateway probes run on a cron trigger and write their results back through the Object; the dashboard subscribes to a single broadcast stream and re-renders on push.</p>
+      <table style="width:100%;border-collapse:collapse;font-size:0.95rem">
+        <thead><tr><th style="text-align:left;padding:0.5rem;border-bottom:1px solid #222;color:#888">component</th><th style="text-align:left;padding:0.5rem;border-bottom:1px solid #222;color:#888">role</th></tr></thead>
+        <tbody>
+          <tr><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a"><code style="color:#00e599">Worker (edge)</code></td><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a">dashboard host, SSE/WebSocket fan-out, session authz, request routing</td></tr>
+          <tr><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a"><code style="color:#00e599">AgentHub DO</code></td><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a">stateful per-workspace object: agent roster, assignment ledger, heartbeat timeline, broadcast channel</td></tr>
+          <tr><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a"><code style="color:#00e599">gateway catalog</code></td><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a">register of every LLM gateway — model mix, capacity, cost, p95 latency, failover state</td></tr>
+          <tr><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a"><code style="color:#00e599">health probe cron</code></td><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a">scheduled Trigger — pings each gateway, writes status back through the Object</td></tr>
+          <tr><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a"><code style="color:#00e599">dispatch bridge</code></td><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a">ingests blackwall RunEvents into the Object's lifecycle timeline</td></tr>
+          <tr><td style="padding:0.5rem"><code style="color:#00e599">dashboard</code></td><td style="padding:0.5rem">single broadcast subscriber, re-renders on push — no polling</td></tr>
+        </tbody>
+      </table>
+      <p style="color:#666;font-size:0.85rem;margin-top:1rem">
+        Cloudflare Workers + Durable Objects · KV for catalog cache · cron triggers for probes · edge-deployed, region-anchored DO
+      </p>
+    </section>
+
+    <section style="margin-top:3rem">
+      <h2 style="color:#00e599;font-size:1.3rem;border-bottom:1px solid #222;padding-bottom:0.5rem">Status</h2>
+      <p>Live at <code style="color:#00e599">mission-control.unsigned.gg</code> and <code style="color:#00e599">agent.unsigned.gg</code>. The gateway catalog panel and dispatch monitor are the daily driver for routing decisions on the estate; agent lifecycle visualization is wired into the live dispatch bridge and rendered as a scrubable timeline. Health probes run on a fixed cadence and fence unhealthy gateways off the routing table automatically.</p>
+    </section>
+
+    <footer style="margin-top:3rem;padding-top:1rem;border-top:1px solid #222;color:#555;font-size:0.85rem;font-family:JetBrains Mono,monospace">
+      <span>unsigned // mission-control — live agent orchestration surface</span>
+      <span style="float:right">// watch the agents work</span>
+    </footer>
+  </main>
+</body>
+</html>

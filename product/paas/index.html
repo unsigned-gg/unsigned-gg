@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>unsigned-paas · unsigned // Kubernetes-native AI/ML PaaS</title>
+  <meta name="description" content="unsigned-paas — the Kubernetes-native platform hosting the entire unsigned ecosystem. Bare-metal Talos on Vultr, Cilium networking, Longhorn storage, ~27 Helm charts, ArgoCD GitOps, Keycloak OIDC, OpenBao secrets, Harbor registry, Prometheus/Grafana/Loki/Jaeger observability." />
+  <meta name="theme-color" content="#0a0a0a" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%230a0a0a'/><text x='16' y='22' font-family='monospace' font-size='16' fill='%2300e599' text-anchor='middle'>{ }</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+<body style="background:#0a0a0a;color:#c8c8c8;font-family:Inter,sans-serif;max-width:840px;margin:0 auto;padding:2rem 1.5rem;line-height:1.6">
+  <header style="border-bottom:1px solid #222;padding-bottom:1rem;margin-bottom:2rem">
+    <a href="/" style="color:#00e599;text-decoration:none;font-family:JetBrains Mono,monospace;font-weight:500">unsigned<b>.gg</b></a>
+    <span style="color:#555;font-family:JetBrains Mono,monospace;font-size:0.9rem">/product/paas</span>
+  </header>
+  <main>
+    <p style="color:#00e599;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.1em;margin:0">unsigned platform · cluster infrastructure · running</p>
+    <h1 style="font-size:2.5rem;font-weight:300;letter-spacing:-0.02em;margin:0.5rem 0">The platform that hosts itself.</h1>
+    <p style="font-size:1.15rem;color:#999;font-weight:300;max-width:620px">
+      unsigned-paas is the Kubernetes-native AI/ML platform that runs the entire unsigned
+      ecosystem — including its own control plane. Bare-metal Talos on Vultr, Cilium
+      networking, Longhorn storage, ~27 Helm charts reconciled through ArgoCD GitOps.
+      Every sibling product — blackwall, overflow, reverie — is a workload on this cluster.
+    </p>
+
+    <section style="margin-top:3rem">
+      <h2 style="color:#00e599;font-size:1.3rem;border-bottom:1px solid #222;padding-bottom:0.5rem">What it does</h2>
+      <p>
+        A single self-hosted cluster that takes bare metal and turns it into a developer
+        platform: identities, secrets, registries, CI/CD, observability, and mesh — all
+        declared in Git and reconciled continuously. No managed control plane, no
+        click-ops. The same manifests that stood the cluster up can rebuild it from
+        scratch on a fresh region.
+      </p>
+      <ul style="list-style:none;padding:0">
+        <li style="padding:0.5rem 0;border-bottom:1px solid #1a1a1a"><strong style="color:#e0e0e0">Cluster fabric</strong> — Talos Linux on Vultr bare metal, immutable K8s API, Cilium eBPF networking, Longhorn distributed block storage</li>
+        <li style="padding:0.5rem 0;border-bottom:1px solid #1a1a1a"><strong style="color:#e0e0e0">GitOps backbone</strong> — ~27 Helm charts, ArgoCD ApplicationSets, app-of-apps root, drift detection, prune + self-heal on</li>
+        <li style="padding:0.5rem 0;border-bottom:1px solid #1a1a1a"><strong style="color:#e0e0e0">Identity &amp; secrets</strong> — Keycloak OIDC for SSO across every service, OpenBao for dynamic secrets, Tailscale tailnet for operator access</li>
+        <li style="padding:0.5rem 0;border-bottom:1px solid #1a1a1a"><strong style="color:#e0e0e0">Artifact supply chain</strong> — Harbor registry with vulnerability scanning, signed image policy, robot accounts per service</li>
+        <li style="padding:0.5rem 0;border-bottom:1px solid #1a1a1a"><strong style="color:#e0e0e0">Observability stack</strong> — Prometheus + Grafana dashboards, Loki log aggregation, Jaeger distributed tracing, unified alerting via Alertmanager</li>
+        <li style="padding:0.5rem 0;border-bottom:1px solid #1a1a1a"><strong style="color:#e0e0e0">CI/CD pipelines</strong> — container builds push to Harbor, ArgoCD auto-syncs on image-tag bump, rollback is a Git revert</li>
+        <li style="padding:0.5rem 0;border-bottom:1px solid #1a1a1a"><strong style="color:#e0e0e0">SOPs &amp; runbooks</strong> — every operational action documented as a procedure: swaps, rotations, incident response, cluster rebuild</li>
+      </ul>
+    </section>
+
+    <section style="margin-top:3rem">
+      <h2 style="color:#00e599;font-size:1.3rem;border-bottom:1px solid #222;padding-bottom:0.5rem">Why bare-metal Talos</h2>
+      <p>
+        No managed control plane means no API bills, no vendor lock-in, and full control
+        over the kernel surface — which matters for blackwall's Landlock jail. Talos gives
+        an immutable, API-driven node image with zero host SSH; everything flows through
+        the K8s API or the Tailscale sidechannel. Vultr bare metal keeps latency to the
+        GPU nodes low and the bill predictable.
+      </p>
+    </section>
+
+    <section style="margin-top:3rem">
+      <h2 style="color:#00e599;font-size:1.3rem;border-bottom:1px solid #222;padding-bottom:0.5rem">Stack</h2>
+      <table style="width:100%;border-collapse:collapse;font-size:0.95rem">
+        <thead><tr><th style="text-align:left;padding:0.5rem;border-bottom:1px solid #222;color:#888">layer</th><th style="text-align:left;padding:0.5rem;border-bottom:1px solid #222;color:#888">component</th></tr></thead>
+        <tbody>
+          <tr><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a"><strong style="color:#e0e0e0">Nodes</strong></td><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a">Talos Linux on Vultr bare metal, immutable node image, no host SSH</td></tr>
+          <tr><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a"><strong style="color:#e0e0e0">Networking</strong></td><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a">Cilium eBPF datapath, Hubble flow observability, NetworkPolicies as the default-deny perimeter</td></tr>
+          <tr><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a"><strong style="color:#e0e0e0">Storage</strong></td><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a">Longhorn distributed block, replica-2 default, snapshot + backup to S3-compatible object store</td></tr>
+          <tr><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a"><strong style="color:#e0e0e0">GitOps</strong></td><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a">ArgoCD ApplicationSets, app-of-apps root manifest, auto-prune + self-heal</td></tr>
+          <tr><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a"><strong style="color:#e0e0e0">Charts</strong></td><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a">~27 Helm releases spanning platform services, AI/ML workloads, and the mesh</td></tr>
+          <tr><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a"><strong style="color:#e0e0e0">Identity</strong></td><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a">Keycloak OIDC — one IdP fronts every ingress; OpenBao issues dynamic, leased secrets</td></tr>
+          <tr><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a"><strong style="color:#e0e0e0">Registry</strong></td><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a">Harbor — image storage, Trivy scanning, signing, per-service robot accounts</td></tr>
+          <tr><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a"><strong style="color:#e0e0e0">Metrics</strong></td><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a">Prometheus scrape + Alertmanager; Grafana dashboards per service and per namespace</td></tr>
+          <tr><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a"><strong style="color:#e0e0e0">Logs &amp; traces</strong></td><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a">Loki for structured log aggregation; Jaeger for distributed traces across the mesh</td></tr>
+          <tr><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a"><strong style="color:#e0e0e0">Access</strong></td><td style="padding:0.5rem;border-bottom:1px solid #1a1a1a">Tailscale tailnet — operators reach the cluster over WireGuard, identity-bound, no static VPN</td></tr>
+          <tr><td style="padding:0.5rem"><strong style="color:#e0e0e0">CI/CD</strong></td><td style="padding:0.5rem">Build to push Harbor, bump image tag in Git, ArgoCD syncs the new revision; rollback is a Git revert</td></tr>
+        </tbody>
+      </table>
+      <p style="color:#666;font-size:0.85rem;margin-top:1rem">
+        bare-metal Talos · Cilium eBPF · Longhorn replica-2 · ArgoCD self-heal · ~27 Helm releases · Keycloak OIDC · OpenBao dynamic secrets · Harbor signed images · Prometheus + Grafana + Loki + Jaeger · Tailscale tailnet
+      </p>
+    </section>
+
+    <section style="margin-top:3rem">
+      <h2 style="color:#00e599;font-size:1.3rem;border-bottom:1px solid #222;padding-bottom:0.5rem">Status</h2>
+      <p>
+        Running in production and hosting every unsigned product — including the agent
+        control plane that manages its own deployments. OpenBao and Keycloak carry the
+        widest blast radius; both are treated as tier-zero and rotate on a fixed cadence.
+        Every operator action follows a written SOP; cluster rebuild is regularly rehearsed
+        from the Git root manifest.
+      </p>
+    </section>
+
+    <section style="margin-top:3rem">
+      <h2 style="color:#00e599;font-size:1.3rem;border-bottom:1px solid #222;padding-bottom:0.5rem">What's next</h2>
+      <p style="color:#777">Multi-region Talos pool · signed-node attestation via SPIRE · OpenBao dynamic DB creds across all services · cross-cluster ArgoCD ApplicationSet promotion · Longhorn continuous backup verification · Cilium service mesh replacing the sidecar layer</p>
+    </section>
+
+    <footer style="margin-top:3rem;padding-top:1rem;border-top:1px solid #222;color:#555;font-size:0.85rem;font-family:JetBrains Mono,monospace">
+      <span>unsigned // paas — Kubernetes-native AI/ML PaaS</span>
+      <span style="float:right">// the platform hosts itself</span>
+    </footer>
+  </main>
+</body>
+</html>
